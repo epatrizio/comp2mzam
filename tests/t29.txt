@@ -1,0 +1,7 @@
+let r = (ref true) in
+begin
+  while (!r) do 
+    r := false 
+  done;
+  print (!r)
+end

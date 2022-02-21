@@ -1,0 +1,2 @@
+let x = 5 in
+  print ((fun y -> return (x + y)) 2)

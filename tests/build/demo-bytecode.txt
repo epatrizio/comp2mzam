@@ -1,0 +1,9 @@
+	CONST 42
+	PRIM print
+	CONST 10
+	PUSH
+	CONST 2
+	PRIM +
+	PRIM print
+fin:
+	STOP

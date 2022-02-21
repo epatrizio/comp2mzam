@@ -1,0 +1,16 @@
+let fact = (fun x -> 
+             let n = (ref x) in
+             begin 
+               print (!n);
+               let acc = (ref 1) in
+               begin
+                 while ((!n) > 1) do
+                   print (!n);
+                   acc := ((!n) * (!acc));
+                   n := ((!n) - 1)
+                 done;
+                 return (!acc)
+               end
+             end)
+in
+  print (fact 1)

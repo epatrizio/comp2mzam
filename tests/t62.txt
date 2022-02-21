@@ -1,0 +1,5 @@
+let y = 5 in
+let z = 100 in
+let f = (fun x -> return (x + (y * z))) in
+let g = (fun h -> return (h 2)) in
+  print (g f)

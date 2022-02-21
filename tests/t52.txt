@@ -1,0 +1,5 @@
+let abs = (fun x -> 
+            if (x > 0) then return x 
+            else return (0 - x))
+in 
+  print (abs 42)

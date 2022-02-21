@@ -1,0 +1,6 @@
+let l = (ref (cons 41 nil)) in
+let l = (ref (cons 42 (!l))) in
+begin
+  print hd (!l);
+  print tl (!l)
+end

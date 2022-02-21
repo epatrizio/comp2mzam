@@ -1,0 +1,3 @@
+print ((fun z -> 
+        let f = (fun x -> return (x+z)) in
+        return (f 5)) 6)

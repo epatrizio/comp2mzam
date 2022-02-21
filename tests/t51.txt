@@ -1,0 +1,2 @@
+let f = (fun x -> print x) in
+  print (f 5)

@@ -1,0 +1,6 @@
+let x = (ref 5) in
+let y = (ref 34) in
+begin
+  x := ((!x) + (!y)); 
+  print x
+end
