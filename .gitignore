@@ -1,3 +1,10 @@
+# specific project generated files
+c2mz
+lexer.ml
+parser.ml
+parser.mli
+bc.txt
+
 *.annot
 *.cmo
 *.cma
