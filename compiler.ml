@@ -3,6 +3,7 @@ open Utils
 
 let compile_expr e li =
   match e with
+  | Ecst (Cbool b) -> (if b then "CONST 1" else "CONST 0") :: li
   | Ecst (Cint i) -> ("CONST " ^ string_of_int i) :: li
 
 let compile_stmt s li =

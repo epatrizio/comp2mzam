@@ -1,5 +1,6 @@
 type constant =
-  | Cint of int
+| Cbool of bool
+| Cint of int
 
 type expr =
   | Ecst of constant
