@@ -3,7 +3,7 @@ c2mz
 lexer.ml
 parser.ml
 parser.mli
-bc.txt
+bc_*.txt
 
 *.annot
 *.cmo

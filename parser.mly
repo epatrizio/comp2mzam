@@ -17,7 +17,7 @@
 prog : s=stmt EOF { s };
 
 stmt :
-     | PRINT e=expr { Ast.Sprint e }
+     | PRINT e=expr NEWLINE { Ast.Sprint e }
      ;
 
 expr :

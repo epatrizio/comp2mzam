@@ -1,20 +1,32 @@
 open Ast
+open Utils
 
-let insts = []
-
-let rec compile_expr e =
+let compile_expr e li =
   match e with
-  | Ecst (Cint i) -> ("CONST " ^ string_of_int i) :: insts
+  | Ecst (Cint i) -> ("CONST " ^ string_of_int i) :: li
 
-let compile_stmt s =
+let compile_stmt s li =
   match s with
-  | Sprint e -> compile_expr e ; "PRIM print" :: insts
+  | Sprint e -> "PRIM print" :: (compile_expr e li)
 
-let compile s =
-  let c = open_out "tests/build/bc.txt" in
-  let fmt = Format.formatter_of_out_channel c in
-    (* compile_stmt s;
-    print_int (List.length insts); *)
-    Format.fprintf fmt "end:\n";
-    Format.fprintf fmt "\tSTOP\n";
-    close_out c
+let compile stmt in_file_name =
+  let oc = open_out ("tests/build/bc_" ^ (Filename.basename in_file_name)) in
+  let fmt = Format.formatter_of_out_channel oc in
+  let inst_processing si =
+    if String.starts_with "LABEL" si then
+      let sl = String.split_on_char ';' si in
+      let label_inst = List.hd sl in
+      let label = String.sub label_inst 6 ((String.length label_inst) - 6) in
+      let inst = List.nth sl 1 in
+      Format.fprintf fmt "%s:\n\t%s\n" label inst
+    else
+      Format.fprintf fmt "\t%s\n" si
+  in
+  let insts_processing li =
+    let li_r = reverse_list li in
+      List.map (fun s -> inst_processing s) li_r;
+      Format.fprintf fmt "@."
+  in
+  let insts = "LABEL end;STOP" :: compile_stmt stmt [] in
+    insts_processing insts;
+    close_out oc
