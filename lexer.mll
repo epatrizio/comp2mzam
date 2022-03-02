@@ -2,14 +2,12 @@
   open Parser
 }
 
-let boolean = "true" | "false"
 let integer = ['0'-'9']+
 let newline = '\r' | '\n' | "\r\n"
 let spaces = [' ' '\t']+
 
 rule token = parse
   | "print"       { PRINT }
-  | boolean as b  { CST (Cbool (bool_of_string b)) }
   | integer as s  { CST (Cint (int_of_string s)) }
   | spaces        { token lexbuf }
   | newline       { NEWLINE }
