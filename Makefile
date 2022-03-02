@@ -19,6 +19,9 @@ clean:
 clean_bc:
 	rm -rf tests/build/bc_*.txt
 
+check_grammar:
+	menhir --list-errors parser.mly
+
 compile:
 	./$(EXE) $(SC)
 

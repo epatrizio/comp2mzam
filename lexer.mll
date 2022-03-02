@@ -7,6 +7,12 @@ let newline = '\r' | '\n' | "\r\n"
 let spaces = [' ' '\t']+
 
 rule token = parse
+  | '+'           { PLUS }
+  | '-'           { MINUS }
+  | '*'           { MULT }
+  | '/'           { DIV }
+  | '('           { LP }
+  | ')'           { RP }
   | "print"       { PRINT }
   | integer as s  { CST (Cint (int_of_string s)) }
   | spaces        { token lexbuf }
