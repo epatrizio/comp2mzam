@@ -2,9 +2,9 @@
 %}
 
 %token <Ast.constant> CST
-%token PRINT NOT
+%token IF THEN ELSE PRINT NOT
 %token EOF
-%token LP RP NEWLINE
+%token LP RP
 %token PLUS MINUS MULT DIV
 
 (* Not useful > for now always parentheses
@@ -23,7 +23,8 @@
 prog : s=stmt EOF { s };
 
 stmt :
-     | PRINT e=expr NEWLINE { Ast.Sprint e }
+     | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (e, s1, s2) }
+     | PRINT e=expr { Ast.Sprint e }
      ;
 
 expr :

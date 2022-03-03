@@ -14,6 +14,7 @@ type expr =
   | Ebinop of binop * expr * expr
 
 and stmt =
+  | Sif of expr * stmt * stmt
   | Sprint of expr
 
 type prog = stmt

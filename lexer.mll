@@ -14,11 +14,14 @@ rule token = parse
   | '/'           { DIV }
   | '('           { LP }
   | ')'           { RP }
+  | "if"          { IF }
+  | "then"        { THEN }
+  | "else"        { ELSE }
   | "not"         { NOT }
   | "print"       { PRINT }
   | boolean as b  { CST (Cbool (bool_of_string b)) }
   | integer as s  { CST (Cint (int_of_string s)) }
   | spaces        { token lexbuf }
-  | newline       { NEWLINE }
+  | newline       { token lexbuf }
   | eof           { EOF }
   | _ as lxm      { Printf.printf "Unexpected character: %c" lxm; exit 0 }
