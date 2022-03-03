@@ -20,7 +20,7 @@ let rec compile_expr ?(label = "") e li =
   | Ebinop (Ble,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM <="] @ li
   | Ebinop (Bgt,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM >"] @ li
   | Ebinop (Bge,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM >="] @ li
-  | Ebinop (Band,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM and"] @ li
+  | Ebinop (Band,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM &"] @ li
   | Ebinop (Bor,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM or"] @ li
 
 let rec compile_stmt ?(label = "") s li =
