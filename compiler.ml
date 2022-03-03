@@ -5,7 +5,9 @@ let error message = raise (Error message)
 
 let rec compile_expr e li =
   match e with
+  | Ecst (Cbool b) -> (if b then "CONST 1" else "CONST 0") :: li
   | Ecst (Cint i) -> ("CONST " ^ string_of_int i) :: li
+  | Eunop (Unot,e) -> (compile_expr e li) @ ["PRIM not"] @ li
   | Ebinop (Badd,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM +"] @ li
   | Ebinop (Bsub,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM -"] @ li
   | Ebinop (Bmul,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM *"] @ li
