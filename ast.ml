@@ -2,7 +2,9 @@ type unop =
   | Unot (* not e *)
 
 type binop =
-  | Badd | Bsub | Bmul | Bdiv    (* + - * / *)
+  | Badd | Bsub | Bmul | Bdiv           (* + - * / *)
+  | Beq | Bneq | Blt | Ble | Bgt | Bge  (* == != < <= > >= *)
+  | Band | Bor                          (* && || *)
 
 type constant =
   | Cbool of bool

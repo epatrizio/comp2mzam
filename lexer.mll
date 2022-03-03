@@ -12,11 +12,19 @@ rule token = parse
   | '-'           { MINUS }
   | '*'           { MULT }
   | '/'           { DIV }
+  | "=="          { CMP_EQ }
+  | "!="          { CMP_NEQ }
+  | '<'           { CMP_LT }
+  | "<="          { CMP_LE }
+  | '>'           { CMP_GT }
+  | ">="          { CMP_GE }
   | '('           { LP }
   | ')'           { RP }
   | "if"          { IF }
   | "then"        { THEN }
   | "else"        { ELSE }
+  | "and"         { AND }
+  | "or"          { OR }
   | "not"         { NOT }
   | "print"       { PRINT }
   | boolean as b  { CST (Cbool (bool_of_string b)) }

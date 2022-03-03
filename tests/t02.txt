@@ -1,0 +1,4 @@
+if (((not true) or (2 != 2)) or (1 >= 2)) then
+  print 1
+else
+  print 2
