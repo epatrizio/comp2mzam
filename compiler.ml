@@ -12,6 +12,7 @@ let rec compile_expr ?(label = "") e li =
   | Ebinop (Badd,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM +"] @ li
   | Ebinop (Bsub,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM -"] @ li
   | Ebinop (Bmul,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM *"] @ li
+  | Ebinop (Bdiv,e1,Ecst (Cint 0)) -> error "division by zero"
   | Ebinop (Bdiv,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM /"] @ li
   | Ebinop (Beq,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM ="] @ li
   | Ebinop (Bneq,e1,e2) -> (compile_expr e2 li) @ ["PUSH"] @ (compile_expr e1 li) @ ["PRIM <>"] @ li
