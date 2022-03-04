@@ -2,9 +2,9 @@
 %}
 
 %token <Ast.constant> CST
-%token IF THEN ELSE PRINT AND OR NOT
+%token BEGIN END IF THEN ELSE PRINT AND OR NOT
 %token EOF
-%token LP RP CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
+%token SEMICOLON LP RP CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
 %token PLUS MINUS MULT DIV
 
 (* Not useful > for now always parentheses
@@ -15,6 +15,7 @@
 %start prog
 
 %type <Ast.stmt> prog
+%type <Ast.block> block
 %type <Ast.stmt> stmt
 %type <Ast.expr> expr
 
@@ -23,8 +24,14 @@
 prog : s=stmt EOF { s };
 
 stmt :
+     | BEGIN b=block END { Ast.Sblock b }
      | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (e, s1, s2) }
      | PRINT e=expr { Ast.Sprint e }
+     ;
+
+block :
+     | s=stmt { Ast.Bstmt s }
+     | s=stmt SEMICOLON b=block { Ast.Bseq (s, b) }
      ;
 
 expr :

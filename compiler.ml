@@ -25,9 +25,15 @@ let rec compile_expr ?(label = "") e li =
 
 let rec compile_stmt ?(label = "") s li =
   match s with
+  | Sblock b -> compile_block ~label:label b li
   | Sif (e,s1,s2) ->
       (compile_expr e li) @ ["BRANCHIFNOT f"] @ (compile_stmt s1 li) @ ["BRANCH t"] @ (compile_stmt ~label:"f" s2 li) @ labeled_inst ~label:"t" "STOP"
   | Sprint e -> (compile_expr ~label:label e li) @ ["PRIM print"]
+
+and compile_block ?(label = "") b li =
+  match b with
+  | Bstmt s -> compile_stmt ~label:label s li
+  | Bseq (s,b) -> compile_stmt ~label:label s li @ compile_block ~label:label b li
 
 let compile stmt in_file_name =
   let oc = open_out ("tests/build/bc_" ^ (Filename.basename in_file_name)) in

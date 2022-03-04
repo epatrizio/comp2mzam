@@ -1,0 +1,8 @@
+begin
+  print 42;
+  print ((((1*2)+50)-10)/2);
+  if ((true and (not false)) or (1 == 2)) then
+    print 1
+  else
+    print 0
+end

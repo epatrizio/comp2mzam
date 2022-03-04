@@ -20,6 +20,9 @@ rule token = parse
   | ">="          { CMP_GE }
   | '('           { LP }
   | ')'           { RP }
+  | ';'           { SEMICOLON }
+  | "begin"       { BEGIN }
+  | "end"         { END }
   | "if"          { IF }
   | "then"        { THEN }
   | "else"        { ELSE }

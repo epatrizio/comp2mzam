@@ -16,7 +16,12 @@ type expr =
   | Ebinop of binop * expr * expr
 
 and stmt =
+  | Sblock of block
   | Sif of expr * stmt * stmt
   | Sprint of expr
+
+and block =
+  | Bstmt of stmt
+  | Bseq of stmt * block
 
 type prog = stmt
