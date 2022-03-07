@@ -1,3 +1,5 @@
+type ident = string
+
 type unop =
   | Unot (* not e *)
 
@@ -12,10 +14,12 @@ type constant =
 
 type expr =
   | Ecst of constant
+  | Eident of ident
   | Eunop of unop * expr
   | Ebinop of binop * expr * expr
 
 and stmt =
+  | Sassign of ident * expr * stmt
   | Sblock of block
   | Sif of expr * stmt * stmt
   | Sprint of expr
