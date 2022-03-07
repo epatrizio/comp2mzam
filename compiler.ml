@@ -36,13 +36,15 @@ let rec compile_stmt ?(label = "") s env li =
     (compile_expr e env 0 li) @ ["PUSH"] @ (compile_stmt s (i :: env) li) @ ["POP"]
   | Sblock b -> compile_block ~label:label b env li
   | Sif (e,s1,s2) ->
-      (compile_expr e env 0 li) @ ["BRANCHIFNOT f"] @ (compile_stmt s1 env li) @ ["BRANCH t"] @ (compile_stmt ~label:"f" s2 env li) @ labeled_inst ~label:"t" "STOP"
+      (compile_expr e env 0 li) @ ["BRANCHIFNOT f"] @ (compile_stmt s1 env li) @ ["BRANCH t"] @ (compile_stmt ~label:"f" s2 env li) @ labeled_inst ~label:"t" ""
   | Sprint e -> (compile_expr ~label:label e env 0 li) @ ["PRIM print"]
 
 and compile_block ?(label = "") b env li =
   match b with
   | Bstmt s -> compile_stmt ~label:label s env li
   | Bseq (s,b) -> compile_stmt ~label:label s env li @ compile_block ~label:label b env li
+
+let compile_prog stmt = compile_stmt stmt [] [] @ ["STOP"]
 
 let compile stmt in_file_name =
   let oc = open_out ("tests/build/bc_" ^ (Filename.basename in_file_name)) in
@@ -61,6 +63,6 @@ let compile stmt in_file_name =
     List.map (fun s -> inst_processing s) li;
     Format.fprintf fmt "@."
   in
-  let insts = compile_stmt stmt [] [] @ labeled_inst ~label:"end" "STOP" in
+  let insts = compile_prog stmt in
     insts_processing insts;
     close_out oc
