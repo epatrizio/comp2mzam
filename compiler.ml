@@ -28,7 +28,9 @@ let rec compile_expr ?(label = "") e env k li =
 
 let rec compile_stmt ?(label = "") s env li =
   match s with
-  | Sassign(i,e,s) -> (compile_expr e env 0 li) @ ["PUSH"] @ (compile_stmt s (i :: env) li) @ ["POP"]
+  | Sassign(i,e,s) ->
+    if List.mem i env then error ("local var already bound: " ^ i);
+    (compile_expr e env 0 li) @ ["PUSH"] @ (compile_stmt s (i :: env) li) @ ["POP"]
   | Sblock b -> compile_block ~label:label b env li
   | Sif (e,s1,s2) ->
       (compile_expr e env 0 li) @ ["BRANCHIFNOT f"] @ (compile_stmt s1 env li) @ ["BRANCH t"] @ (compile_stmt ~label:"f" s2 env li) @ labeled_inst ~label:"t" "STOP"
