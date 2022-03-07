@@ -5,6 +5,9 @@ exception Error of string
 let error message = raise (Error message)
 
 let rec compile_expr ?(label = "") e env k li =
+  let compile_binop_expr e1 e2 prim env k li =
+    (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM " ^ prim]
+  in
   match e with
   | Ecst (Cbool b) -> labeled_inst ~label:label (if b then "CONST 1" else "CONST 0") @ li
   | Ecst (Cint i) -> labeled_inst ~label:label ("CONST " ^ string_of_int i) @ li
@@ -12,19 +15,19 @@ let rec compile_expr ?(label = "") e env k li =
     if not (List.mem i env) then error ("unbound local var: " ^ i);
     ["ACC " ^ string_of_int k] @ li
   | Eunop (Unot,e) -> (compile_expr e env k li) @ ["PRIM not"] @ li
-  | Ebinop (Badd,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM +"] @ li
-  | Ebinop (Bsub,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM -"] @ li
-  | Ebinop (Bmul,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM *"] @ li
+  | Ebinop (Badd,e1,e2) -> compile_binop_expr e1 e2 "+" env k li @ li
+  | Ebinop (Bsub,e1,e2) -> compile_binop_expr e1 e2 "-" env k li @ li
+  | Ebinop (Bmul,e1,e2) -> compile_binop_expr e1 e2 "*" env k li @ li
   | Ebinop (Bdiv,e1,Ecst (Cint 0)) -> error "division by zero"
-  | Ebinop (Bdiv,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM /"] @ li
-  | Ebinop (Beq,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM ="] @ li
-  | Ebinop (Bneq,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM <>"] @ li
-  | Ebinop (Blt,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM <"] @ li
-  | Ebinop (Ble,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM <="] @ li
-  | Ebinop (Bgt,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM >"] @ li
-  | Ebinop (Bge,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM >="] @ li
-  | Ebinop (Band,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM &"] @ li
-  | Ebinop (Bor,e1,e2) -> (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM or"] @ li
+  | Ebinop (Bdiv,e1,e2) -> compile_binop_expr e1 e2 "/" env k li @ li
+  | Ebinop (Beq,e1,e2) -> compile_binop_expr e1 e2 "=" env k li @ li
+  | Ebinop (Bneq,e1,e2) -> compile_binop_expr e1 e2 "<>" env k li @ li
+  | Ebinop (Blt,e1,e2) -> compile_binop_expr e1 e2 "<" env k li @ li
+  | Ebinop (Ble,e1,e2) -> compile_binop_expr e1 e2 "<=" env k li @ li
+  | Ebinop (Bgt,e1,e2) -> compile_binop_expr e1 e2 ">" env k li @ li
+  | Ebinop (Bge,e1,e2) -> compile_binop_expr e1 e2 ">=" env k li @ li
+  | Ebinop (Band,e1,e2) -> compile_binop_expr e1 e2 "&" env k li @ li
+  | Ebinop (Bor,e1,e2) -> compile_binop_expr e1 e2 "or" env k li @ li
 
 let rec compile_stmt ?(label = "") s env li =
   match s with
