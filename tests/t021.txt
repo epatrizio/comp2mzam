@@ -1,0 +1,12 @@
+let x = (ref (30+10)) in
+let y = (ref (4/2)) in
+let z = 27 in
+begin
+  print (!x);
+  print (!y);
+  print z;
+  x := ((!x) + (!y)); 
+  print (!x);
+  y := (((2 * (!x)) * 2) / 4);
+  print (!y)
+end

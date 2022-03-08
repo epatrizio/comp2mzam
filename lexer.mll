@@ -27,6 +27,7 @@ rule token = parse
   | ')'           { RP }
   | ';'           { SEMICOLON }
   | '!'           { EXCL }
+  | ":="          { REF_EQUAL }
   | "let"         { LET }
   | "in"          { IN }
   | "ref"         { REF }

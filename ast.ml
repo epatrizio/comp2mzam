@@ -22,6 +22,7 @@ type expr =
 
 and stmt =
   | Sassign of ident * expr * stmt
+  | Srefassign of ident * expr
   | Sblock of block
   | Sif of expr * stmt * stmt
   | Sprint of expr
