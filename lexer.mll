@@ -26,8 +26,10 @@ rule token = parse
   | '('           { LP }
   | ')'           { RP }
   | ';'           { SEMICOLON }
+  | '!'           { EXCL }
   | "let"         { LET }
   | "in"          { IN }
+  | "ref"         { REF }
   | "begin"       { BEGIN }
   | "end"         { END }
   | "if"          { IF }

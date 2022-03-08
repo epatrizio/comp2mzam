@@ -15,6 +15,8 @@ type constant =
 type expr =
   | Ecst of constant
   | Eident of ident
+  | Eref of expr
+  | Ederef of ident
   | Eunop of unop * expr
   | Ebinop of binop * expr * expr
 

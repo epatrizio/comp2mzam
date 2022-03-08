@@ -2,9 +2,9 @@
 %}
 
 %token <Ast.constant> CST
-%token LET IN BEGIN END IF THEN ELSE PRINT AND OR NOT
+%token LET IN REF BEGIN END IF THEN ELSE PRINT AND OR NOT
 %token EOF
-%token SEMICOLON LP RP EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
+%token SEMICOLON EXCL LP RP EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
 %token PLUS MINUS MULT DIV
 %token<string> IDENT
 
@@ -52,6 +52,8 @@ expr :
      | LP e1=expr CMP_GE e2=expr RP { Ast.Ebinop (Bge, e1, e2) }
      | LP e1=expr AND e2=expr RP { Ast.Ebinop (Band, e1, e2) }
      | LP e1=expr OR e2=expr RP { Ast.Ebinop (Bor, e1, e2) }
+     | LP REF e=expr RP { Ast.Eref e }
+     | LP EXCL i=IDENT RP { Ast.Ederef i }
      ;
 
 %%

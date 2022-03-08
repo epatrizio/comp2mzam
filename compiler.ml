@@ -28,6 +28,8 @@ let rec compile_expr ?(label = "") e env k li =
   | Ebinop (Bge,e1,e2) -> compile_binop_expr e1 e2 ">=" env k li @ li
   | Ebinop (Band,e1,e2) -> compile_binop_expr e1 e2 "&" env k li @ li
   | Ebinop (Bor,e1,e2) -> compile_binop_expr e1 e2 "or" env k li @ li
+  | Eref e -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
+  | Ederef i -> compile_expr (Eident i) env k li @ ["GETFIELD 0"] @ li
 
 let rec compile_stmt ?(label = "") s env li =
   match s with
