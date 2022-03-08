@@ -13,7 +13,7 @@ let rec compile_expr ?(label = "") e env k li =
   | Ecst (Cint i) -> labeled_inst ~label:label ("CONST " ^ string_of_int i) @ li
   | Eident i ->
     if not (List.mem i env) then error ("unbound local var: " ^ i);
-    ["ACC " ^ string_of_int k] @ li
+    ["ACC " ^ string_of_int ((pos_list env i) + k)] @ li
   | Eunop (Unot,e) -> (compile_expr e env k li) @ ["PRIM not"] @ li
   | Ebinop (Badd,e1,e2) -> compile_binop_expr e1 e2 "+" env k li @ li
   | Ebinop (Bsub,e1,e2) -> compile_binop_expr e1 e2 "-" env k li @ li

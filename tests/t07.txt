@@ -1,0 +1,7 @@
+let x = (40+2) in
+let y = (x*2) in
+  begin
+    print x;
+    print y;
+    print (y/2)
+  end
