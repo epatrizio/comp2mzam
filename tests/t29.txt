@@ -1,6 +1,8 @@
 let r = (ref true) in
 begin
+  print (!r);
   while (!r) do 
+    print 42;
     r := false 
   done;
   print (!r)

@@ -25,6 +25,7 @@ and stmt =
   | Srefassign of ident * expr
   | Sblock of block
   | Sif of expr * stmt * stmt
+  | Swhile of expr * block
   | Sprint of expr
 
 and block =

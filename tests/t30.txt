@@ -2,8 +2,11 @@ let n = (ref 10) in
 let acc = (ref 1) in
 begin
   while ((!n) > 1) do
+    print (!n);
+    print (!acc);
     acc := ((!n) * (!acc));
     n := ((!n) - 1)
   done;
+  print (!n);
   print (!acc)
 end

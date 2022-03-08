@@ -1,4 +1,7 @@
-while false do 
-  print 1 
-done;
-print 2
+begin
+  while (not true) do 
+    print 11;
+    print 22
+  done;
+  print 2
+end

@@ -2,7 +2,7 @@
 %}
 
 %token <Ast.constant> CST
-%token LET IN REF BEGIN END IF THEN ELSE PRINT AND OR NOT
+%token LET IN REF BEGIN END IF THEN ELSE WHILE DO DONE PRINT AND OR NOT
 %token EOF
 %token SEMICOLON EXCL LP RP EQUAL REF_EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
 %token PLUS MINUS MULT DIV
@@ -29,6 +29,7 @@ stmt :
      | LET i=IDENT EQUAL e=expr IN s=stmt { Ast.Sassign(i, e, s) }
      | i=IDENT REF_EQUAL e=expr { Ast.Srefassign(i, e) }
      | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (e, s1, s2) }
+     | WHILE e=expr DO b=block DONE { Ast.Swhile (e, b) }
      | PRINT e=expr { Ast.Sprint e }
      ;
 

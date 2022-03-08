@@ -39,7 +39,9 @@ let rec compile_stmt ?(label = "") s env li =
   | Srefassign(i,e) -> compile_expr e env 0 li @ ["PUSH"] @ compile_expr (Eident i) env 1 li @ ["SETFIELD 0"] @ li
   | Sblock b -> compile_block ~label:label b env li
   | Sif (e,s1,s2) ->
-      (compile_expr e env 0 li) @ ["BRANCHIFNOT f"] @ (compile_stmt s1 env li) @ ["BRANCH t"] @ (compile_stmt ~label:"f" s2 env li) @ labeled_inst ~label:"t" ""
+    compile_expr e env 0 li @ ["BRANCHIFNOT f"] @ compile_stmt s1 env li @ ["BRANCH t"] @ compile_stmt ~label:"f" s2 env li @ labeled_inst ~label:"t" ""
+  | Swhile (e,b) ->
+    compile_expr e env 0 li @ labeled_inst ~label:"wcond" "BRANCHIFNOT wdone" @ compile_block b env li @ compile_expr e env 0 li @ ["BRANCH wcond"] @ labeled_inst ~label:"wdone" ""
   | Sprint e -> (compile_expr ~label:label e env 0 li) @ ["PRIM print"]
 
 and compile_block ?(label = "") b env li =
