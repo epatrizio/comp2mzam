@@ -43,6 +43,7 @@ rule token = parse
   | "or"          { OR }
   | "not"         { NOT }
   | "print"       { PRINT }
+  | "(*"          { comment lexbuf }
   | boolean as b  { CST (Cbool (bool_of_string b)) }
   | integer as s  { CST (Cint (int_of_string s)) }
   | ident as s    { IDENT(s) }
@@ -50,3 +51,9 @@ rule token = parse
   | newline       { token lexbuf }
   | eof           { EOF }
   | _ as lxm      { Printf.printf "Unexpected character: %c" lxm; exit 0 }
+
+and comment = parse
+  | "*)"          { token lexbuf }
+  | newline       { comment lexbuf }
+  | _             { comment lexbuf }
+  | eof           { Printf.printf "unterminated comment"; exit 0 }

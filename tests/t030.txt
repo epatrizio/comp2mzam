@@ -1,0 +1,8 @@
+(* This is a comment *)
+begin
+  print (* In comment *) (40+(* Another in comment *)2);
+  (* Another comment *)
+  print 27
+  (* Another comment *)
+end
+(* End comment *)
