@@ -1,3 +1,6 @@
+open Format
+open Lexing
+
 let labeled_inst ?(label = "") inst =
   match label with
   | "" -> [inst]
@@ -12,3 +15,8 @@ let rec reverse_list l =
   match l with
     | [] -> []
     | x :: xs -> reverse_list xs @ [x]
+
+let localisation pos file =
+  let l = pos.pos_lnum in
+  let c = pos.pos_cnum - pos.pos_bol + 1 in
+    eprintf "File \"%s\", line %d, characters %d-%d:\n" file l (c-1) c

@@ -1,5 +1,9 @@
 {
+  open Lexing
   open Parser
+
+  exception Lexing_error of string
+  let error message = raise (Lexing_error message)
 }
 
 let letter = ['a'-'z' 'A'-'Z']
@@ -50,10 +54,10 @@ rule token = parse
   | spaces        { token lexbuf }
   | newline       { token lexbuf }
   | eof           { EOF }
-  | _ as lxm      { Printf.printf "Unexpected character: %c" lxm; exit 0 }
+  | _ as lxm      { error ("unexpected character: " ^ (Char.escaped lxm)) }
 
 and comment = parse
   | "*)"          { token lexbuf }
   | newline       { comment lexbuf }
   | _             { comment lexbuf }
-  | eof           { Printf.printf "unterminated comment"; exit 0 }
+  | eof           { error "unterminated comment" }
