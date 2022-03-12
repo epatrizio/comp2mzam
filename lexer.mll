@@ -1,3 +1,5 @@
+(* Lexical analyzer *)
+
 {
   open Lexing
   open Parser
@@ -29,6 +31,11 @@ rule token = parse
   | '='           { EQUAL }
   | '('           { LP }
   | ')'           { RP }
+  | '['           { LSQ }
+  | ']'           { RSQ }
+  | '{'           { LCU }
+  | '}'           { RCU }
+  | ','           { COMMA }
   | ';'           { SEMICOLON }
   | '!'           { EXCL }
   | ":="          { REF_EQUAL }
@@ -47,6 +54,7 @@ rule token = parse
   | "or"          { OR }
   | "not"         { NOT }
   | "print"       { PRINT }
+  | "array_size"  { ARRAY_SIZE }
   | "(*"          { comment lexbuf }
   | boolean as b  { CST (Cbool (bool_of_string b)) }
   | integer as s  { CST (Cint (int_of_string s)) }

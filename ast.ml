@@ -1,3 +1,5 @@
+(* Abstract Syntax Tree *)
+
 type ident = string
 
 type unop =
@@ -19,6 +21,9 @@ type expr =
   | Ederef of ident
   | Eunop of unop * expr
   | Ebinop of binop * expr * expr
+  | Earray of expr list
+  | Eaget of ident * constant
+  | Easize of ident
 
 and stmt =
   | Sassign of ident * expr * stmt

@@ -1,10 +1,19 @@
+/* Syntactic analyzer */
+
 %{
 %}
 
+(*
+[] SQuare brackets LSQ RSQ
+() Parenthesis LP RP
+{} CUrly brackets LCU RCU
+*)
+
 %token <Ast.constant> CST
-%token LET IN REF BEGIN END IF THEN ELSE WHILE DO DONE PRINT AND OR NOT
+%token LET IN REF BEGIN END IF THEN ELSE WHILE DO DONE PRINT ARRAY_SIZE AND OR NOT
 %token EOF
-%token SEMICOLON EXCL LP RP EQUAL REF_EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
+%token COMMA SEMICOLON EXCL LP RP LSQ RSQ LCU RCU
+%token EQUAL REF_EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
 %token PLUS MINUS MULT DIV
 %token<string> IDENT
 
@@ -19,6 +28,7 @@
 %type <Ast.block> block
 %type <Ast.stmt> stmt
 %type <Ast.expr> expr
+%type <Ast.expr list> expr_list
 
 %%
 
@@ -56,6 +66,14 @@ expr :
      | LP e1=expr OR e2=expr RP { Ast.Ebinop (Bor, e1, e2) }
      | LP REF e=expr RP { Ast.Eref e }
      | LP EXCL i=IDENT RP { Ast.Ederef i }
+     | LCU l=expr_list RCU { Ast.Earray l }
+     | i=IDENT LSQ c=CST RSQ { Ast.Eaget (i, c) }
+     | LP ARRAY_SIZE i=IDENT RP { Ast.Easize i }
+     ;
+
+expr_list :
+     | e=expr { [e] }
+     | e=expr COMMA l=expr_list { e :: l }
      ;
 
 %%
