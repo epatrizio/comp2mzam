@@ -67,7 +67,7 @@ expr :
      | LP REF e=expr RP { Ast.Eref e }
      | LP EXCL i=IDENT RP { Ast.Ederef i }
      | LCU l=expr_list RCU { Ast.Earray l }
-     | i=IDENT LSQ c=CST RSQ { Ast.Eaget (i, c) }
+     | i=IDENT LSQ e=expr RSQ { Ast.Eaget (i, e) }
      | LP ARRAY_SIZE i=IDENT RP { Ast.Easize i }
      ;
 

@@ -36,8 +36,7 @@ let rec compile_expr ?(label = "") e env k li =
   | Earray l ->
     (List.fold_left (fun acc e -> (compile_expr e env k li) @ ["PUSH"] @ acc) li l)
     @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
-  | Eaget (i,Cbool c) -> error "Bad array index"
-  | Eaget (i,Cint c) -> compile_expr (Eident i) env k li @ ["GETFIELD " ^ string_of_int c] @ li
+  | Eaget (i,e) -> compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident i) env (k+1) li @  ["GETVECTITEM"] @ li
   | Easize i -> compile_expr (Eident i) env k li @ ["VECTLENGTH"] @ li
 
 let rec compile_stmt ?(label = "") s env li =

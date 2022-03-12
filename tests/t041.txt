@@ -5,6 +5,7 @@ let c = false in
 let i = (ref 42) in*)
   begin
     print a1[9];
+    print a1[(9+1)];
     print (array_size a1)
     (*print (array_size a2);
     print a2[0];

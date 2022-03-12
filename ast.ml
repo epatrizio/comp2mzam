@@ -22,7 +22,7 @@ type expr =
   | Eunop of unop * expr
   | Ebinop of binop * expr * expr
   | Earray of expr list
-  | Eaget of ident * constant
+  | Eaget of ident * expr
   | Easize of ident
 
 and stmt =
