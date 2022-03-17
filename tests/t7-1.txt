@@ -1,0 +1,5 @@
+begin
+  let x = 42 in print x;
+  let x = 27 in print x;
+  let y = 27 in print x
+end
