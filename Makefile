@@ -1,4 +1,5 @@
 VM=./mini-zam/vm/minizam
+VM_DEBUG=./mini-zam/vm/minizam-debug
 EXE=c2mz
 
 all:
@@ -23,10 +24,17 @@ check_grammar:
 	menhir --list-errors parser.mly
 
 compile:
-	./$(EXE) $(SC)
+	@./$(EXE) tests/$(S)
 
 vm:
-	$(VM) $(BC)
+	@$(VM) tests/build/bc_$(S)
+
+vm_debug:
+	@$(VM_DEBUG) tests/build/bc_$(S)
+
+cvm: compile vm
+
+cvm_debug: compile vm_debug
 
 vm_demo:
 	$(VM) tests/build/demo-bytecode.txt
