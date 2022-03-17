@@ -1,15 +1,18 @@
 let a1 = {10,20,30,40,50,60,70,80,90,100,110,120} in
-(*let a2 = {1} in
+let a2 = {111} in
 let b = true in
-let c = false in
-let i = (ref 42) in*)
+let c = (not false) in
+let i = (ref 1) in
+let a3 = {100,200} in
   begin
-    print a1[9];
-    print a1[(9+1)];
-    print (array_size a1)
-    (*print (array_size a2);
-    print a2[0];
-    print b;
-    print c;
-    print (!i)*)
+    print (array_size a1);  (* 12 *)
+    print a1[9];            (* 100 *)
+    print a1[(9+1)];        (* 110 *)
+    print (array_size a2);  (* 1 *)
+    print a2[0];            (* 111 *)
+    print b;                (* 1 *)
+    print c;                (* 1 *)
+    print (!i);             (* 1 *)
+    print (array_size a3);  (* 2 *)
+    print a3[(!i)]          (* 200 *)
   end

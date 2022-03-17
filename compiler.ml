@@ -10,6 +10,12 @@ let rec compile_expr ?(label = "") e env k li =
   let compile_binop_expr e1 e2 prim env k li =
     (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM " ^ prim]
   in
+  let rec compile_array_expr la env k li =
+    match la with
+    | [] -> error "empty array"
+    | [e] -> compile_expr e env k li
+    | e::es -> compile_expr e env k li @ ["PUSH"] @ compile_array_expr es env k li
+  in
   match e with
   | Ecst (Cbool b) -> labeled_inst ~label:label (if b then "CONST 1" else "CONST 0") @ li
   | Ecst (Cint i) -> labeled_inst ~label:label ("CONST " ^ string_of_int i) @ li
@@ -33,9 +39,7 @@ let rec compile_expr ?(label = "") e env k li =
   | Eref e -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
   | Ederef i -> compile_expr (Eident i) env k li @ ["GETFIELD 0"] @ li
   | Earray [] -> error "empty array"
-  | Earray l ->
-    (List.fold_left (fun acc e -> (compile_expr e env k li) @ ["PUSH"] @ acc) li l)
-    @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
+  | Earray l -> compile_array_expr (List.rev l) env k li @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
   | Eaget (i,e) -> compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident i) env (k+1) li @  ["GETVECTITEM"] @ li
   | Easize i -> compile_expr (Eident i) env k li @ ["VECTLENGTH"] @ li
 
