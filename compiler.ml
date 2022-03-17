@@ -6,6 +6,8 @@ open Utils
 exception Error of string
 let error message = raise (Error message)
 
+let counter = counter_from 0
+
 let rec compile_expr ?(label = "") e env k li =
   let compile_binop_expr e1 e2 prim env k li =
     (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM " ^ prim]
@@ -53,9 +55,11 @@ let rec compile_stmt ?(label = "") s env li =
     compile_expr e2 env 0 li @ ["PUSH"] @ compile_expr e1 env 1 li @ ["PUSH"] @ compile_expr (Eident i) env 2 li @ ["SETVECTITEM"] @ li
   | Sblock b -> compile_block ~label:label b env li
   | Sif (e,s1,s2) ->
-    compile_expr e env 0 li @ ["BRANCHIFNOT f"] @ compile_stmt s1 env li @ ["BRANCH t"] @ compile_stmt ~label:"f" s2 env li @ labeled_inst ~label:"t" ""
+    let sct = string_of_int (counter ()) in
+    compile_expr e env 0 li @ ["BRANCHIFNOT f" ^ sct] @ compile_stmt s1 env li @ ["BRANCH t" ^ sct] @ compile_stmt ~label:("f"^sct) s2 env li @ labeled_inst ~label:("t"^sct) ""
   | Swhile (e,b) ->
-    compile_expr e env 0 li @ labeled_inst ~label:"wcond" "BRANCHIFNOT wdone" @ compile_block b env li @ compile_expr e env 0 li @ ["BRANCH wcond"] @ labeled_inst ~label:"wdone" ""
+    let sct = string_of_int (counter ()) in
+    compile_expr e env 0 li @ labeled_inst ~label:("wcond"^sct) ("BRANCHIFNOT wdone"^sct) @ compile_block b env li @ compile_expr e env 0 li @ ["BRANCH wcond" ^ sct] @ labeled_inst ~label:("wdone"^sct) ""
   | Sprint e -> (compile_expr ~label:label e env 0 li) @ ["PRIM print"]
 
 and compile_block ?(label = "") b env li =

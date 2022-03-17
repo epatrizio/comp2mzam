@@ -20,3 +20,6 @@ let localisation pos file =
   let l = pos.pos_lnum in
   let c = pos.pos_cnum - pos.pos_bol + 1 in
     eprintf "File \"%s\", line %d, characters %d-%d:\n" file l (c-1) c
+
+let counter_from n =
+  let r = ref (n-1) in fun () -> incr r; !r
