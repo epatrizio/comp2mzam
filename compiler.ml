@@ -49,6 +49,8 @@ let rec compile_stmt ?(label = "") s env li =
     if List.mem i env then error ("local var already bound: " ^ i);
     compile_expr e env 0 li @ ["PUSH"] @ compile_stmt s (i :: env) li @ ["POP"]
   | Srefassign(i,e) -> compile_expr e env 0 li @ ["PUSH"] @ compile_expr (Eident i) env 1 li @ ["SETFIELD 0"] @ li
+  | Saassign(i,e1,e2) ->
+    compile_expr e2 env 0 li @ ["PUSH"] @ compile_expr e1 env 1 li @ ["PUSH"] @ compile_expr (Eident i) env 2 li @ ["SETVECTITEM"] @ li
   | Sblock b -> compile_block ~label:label b env li
   | Sif (e,s1,s2) ->
     compile_expr e env 0 li @ ["BRANCHIFNOT f"] @ compile_stmt s1 env li @ ["BRANCH t"] @ compile_stmt ~label:"f" s2 env li @ labeled_inst ~label:"t" ""

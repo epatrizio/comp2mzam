@@ -38,6 +38,7 @@ stmt :
      | BEGIN b=block END { Ast.Sblock b }
      | LET i=IDENT EQUAL e=expr IN s=stmt { Ast.Sassign(i, e, s) }
      | i=IDENT REF_EQUAL e=expr { Ast.Srefassign(i, e) }
+     | i=IDENT LSQ e1=expr RSQ REF_EQUAL e2=expr { Ast.Saassign(i, e1, e2) }
      | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (e, s1, s2) }
      | WHILE e=expr DO b=block DONE { Ast.Swhile (e, b) }
      | PRINT e=expr { Ast.Sprint e }

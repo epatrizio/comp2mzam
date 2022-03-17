@@ -28,6 +28,7 @@ type expr =
 and stmt =
   | Sassign of ident * expr * stmt
   | Srefassign of ident * expr
+  | Saassign of ident * expr * expr
   | Sblock of block
   | Sif of expr * stmt * stmt
   | Swhile of expr * block
