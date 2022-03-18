@@ -60,12 +60,14 @@ let rec compile_stmt ?(label = "") s env li =
   | Swhile (e,b) ->
     let sct = string_of_int (counter ()) in
     compile_expr e env 0 li @ labeled_inst ~label:("wcond"^sct) ("BRANCHIFNOT wdone"^sct) @ compile_block b env li @ compile_expr e env 0 li @ ["BRANCH wcond" ^ sct] @ labeled_inst ~label:("wdone"^sct) ""
+  | Sfor (s1,e,s2,b) -> compile_stmt s1 env li @ compile_stmt (Swhile (e, Bseq_r (b,s2))) env li
   | Sprint e -> (compile_expr ~label:label e env 0 li) @ ["PRIM print"]
 
 and compile_block ?(label = "") b env li =
   match b with
   | Bstmt s -> compile_stmt ~label:label s env li
-  | Bseq (s,b) -> compile_stmt ~label:label s env li @ compile_block ~label:label b env li
+  | Bseq_l (s,b) -> compile_stmt ~label:label s env li @ compile_block ~label:label b env li
+  | Bseq_r (b,s) -> compile_block ~label:label b env li @ compile_stmt ~label:label s env li
 
 let compile_prog stmt = compile_stmt stmt [] [] @ ["STOP"]
 

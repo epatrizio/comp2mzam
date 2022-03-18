@@ -1,0 +1,14 @@
+let i = (ref 0) in
+let tmp = (ref 0) in
+let coef = 10 in
+begin
+  for i:=1 ; ((!i)<=10) ; i:=((!i)+1) do
+    tmp := (!i);
+    if ((!tmp) < 8) then
+      print ((!i)*coef)
+    else
+      print 42
+  done;
+  print (!i);
+  print (!tmp)
+end

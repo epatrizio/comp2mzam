@@ -10,7 +10,7 @@
 *)
 
 %token <Ast.constant> CST
-%token LET IN REF BEGIN END IF THEN ELSE WHILE DO DONE PRINT ARRAY_SIZE AND OR NOT
+%token LET IN REF BEGIN END IF THEN ELSE WHILE DO DONE FOR PRINT ARRAY_SIZE AND OR NOT
 %token EOF
 %token COMMA SEMICOLON EXCL LP RP LSQ RSQ LCU RCU
 %token EQUAL REF_EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
@@ -41,12 +41,14 @@ stmt :
      | i=IDENT LSQ e1=expr RSQ REF_EQUAL e2=expr { Ast.Saassign(i, e1, e2) }
      | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (e, s1, s2) }
      | WHILE e=expr DO b=block DONE { Ast.Swhile (e, b) }
+     | FOR s1=stmt SEMICOLON e=expr SEMICOLON s2=stmt DO b=block DONE { Ast.Sfor (s1, e, s2, b) }
      | PRINT e=expr { Ast.Sprint e }
      ;
 
 block :
      | s=stmt { Ast.Bstmt s }
-     | s=stmt SEMICOLON b=block { Ast.Bseq (s, b) }
+     | s=stmt SEMICOLON b=block { Ast.Bseq_l (s, b) }
+     | b=block SEMICOLON s=stmt { Ast.Bseq_r (b, s) }
      ;
 
 expr :

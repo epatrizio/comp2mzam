@@ -50,6 +50,7 @@ rule token = parse
   | "while"       { WHILE }
   | "do"          { DO }
   | "done"        { DONE }
+  | "for"         { FOR }
   | "and"         { AND }
   | "or"          { OR }
   | "not"         { NOT }

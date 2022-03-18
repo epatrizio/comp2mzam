@@ -32,10 +32,12 @@ and stmt =
   | Sblock of block
   | Sif of expr * stmt * stmt
   | Swhile of expr * block
+  | Sfor of stmt * expr * stmt * block
   | Sprint of expr
 
 and block =
   | Bstmt of stmt
-  | Bseq of stmt * block
+  | Bseq_l of stmt * block
+  | Bseq_r of block * stmt
 
 type prog = stmt
