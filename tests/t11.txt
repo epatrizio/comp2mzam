@@ -1,0 +1,12 @@
+let i = (ref ()) in
+begin
+  while ((!i) < 10) do
+    print (!i);
+    i := ((!i) + 1)
+  done;
+  exit;
+  while ((!i) < 20) do
+    print (!i);
+    i := ((!i) + 1)
+  done
+end

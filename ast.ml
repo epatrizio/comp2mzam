@@ -35,6 +35,7 @@ and stmt =
   | Swhile of expr * block
   | Sfor of stmt * expr * stmt * block
   | Sprint of expr
+  | Sexit
 
 and block =
   | Bstmt of stmt
