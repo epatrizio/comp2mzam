@@ -21,6 +21,7 @@ let rec compile_expr ?(label = "") e env k li =
   match e with
   | Ecst (Cbool b) -> labeled_inst ~label:label (if b then "CONST 1" else "CONST 0") @ li
   | Ecst (Cint i) -> labeled_inst ~label:label ("CONST " ^ string_of_int i) @ li
+  | Ecst Cunit -> labeled_inst ~label:label ("CONST 0") @ li
   | Eident i ->
     if not (List.mem i env) then error ("unbound local var: " ^ i);
     ["ACC " ^ string_of_int ((pos_list env i) + k)] @ li

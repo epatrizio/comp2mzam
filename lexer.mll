@@ -11,6 +11,7 @@
 let letter = ['a'-'z' 'A'-'Z']
 let digit = ['0'-'9']
 
+let unit = "()"
 let boolean = "true" | "false"
 let integer = ['0'-'9']+
 let newline = '\r' | '\n' | "\r\n"
@@ -59,6 +60,7 @@ rule token = parse
   | "(*"          { comment lexbuf }
   | boolean as b  { CST (Cbool (bool_of_string b)) }
   | integer as s  { CST (Cint (int_of_string s)) }
+  | unit          { CST Cunit }
   | ident as s    { IDENT(s) }
   | spaces        { token lexbuf }
   | newline       { token lexbuf }

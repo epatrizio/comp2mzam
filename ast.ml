@@ -11,6 +11,7 @@ type binop =
   | Band | Bor                          (* && || *)
 
 type constant =
+  | Cunit
   | Cbool of bool
   | Cint of int
 
