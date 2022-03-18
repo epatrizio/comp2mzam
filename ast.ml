@@ -36,6 +36,7 @@ and stmt =
   | Sfor of stmt * expr * stmt * block
   | Sprint of expr
   | Sexit
+  | Sskip
 
 and block =
   | Bstmt of stmt

@@ -63,7 +63,8 @@ let rec compile_stmt ?(label = "") s env li =
     compile_expr e env 0 li @ labeled_inst ~label:("wcond"^sct) ("BRANCHIFNOT wdone"^sct) @ compile_block b env li @ compile_expr e env 0 li @ ["BRANCH wcond" ^ sct] @ labeled_inst ~label:("wdone"^sct) ""
   | Sfor (s1,e,s2,b) -> compile_stmt s1 env li @ compile_stmt (Swhile (e, Bseq_r (b,s2))) env li
   | Sprint e -> (compile_expr ~label:label e env 0 li) @ ["PRIM print"]
-  | Sexit -> ["STOP"] @ li
+  | Sexit -> labeled_inst ~label:label ("STOP") @ li
+  | Sskip -> labeled_inst ~label:label ("CONST 0") @ li
 
 and compile_block ?(label = "") b env li =
   match b with

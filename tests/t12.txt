@@ -1,0 +1,13 @@
+let i = (ref ()) in
+begin
+  print 42;
+  skip;
+  print 27;
+  for i:=1 ; ((!i)<=10) ; i:=((!i)+1) do
+    if ((!i) < 5) then
+      print (!i)
+    else
+      skip
+  done;
+  print 42
+end

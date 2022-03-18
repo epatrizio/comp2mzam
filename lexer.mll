@@ -58,6 +58,7 @@ rule token = parse
   | "print"       { PRINT }
   | "array_size"  { ARRAY_SIZE }
   | "exit"        { EXIT }
+  | "skip"        { SKIP }
   | "(*"          { comment lexbuf }
   | boolean as b  { CST (Cbool (bool_of_string b)) }
   | integer as s  { CST (Cint (int_of_string s)) }
