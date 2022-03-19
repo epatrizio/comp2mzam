@@ -1,6 +1,9 @@
 VM=./mini-zam/vm/minizam
 VM_DEBUG=./mini-zam/vm/minizam-debug
 EXE=c2mz
+RED=\033[0;31m
+GREEN=\033[0;32m
+NC=\033[0m # No Color
 
 all:
 	ocamlc -c utils.ml;
@@ -35,6 +38,14 @@ vm_debug:
 cvm: compile vm
 
 cvm_debug: compile vm_debug
+
+test:
+	$(eval RES := $(shell S=$(S) make cvm))
+	@if [ $(RES) = ${R} ]; then echo "$(GREEN)$(S) PASSED$(NC)"; else echo "$(RED)$(S) FAILED $(RES)<>$(R)$(NC)"; fi
+
+# KO > todo
+tests_suite: clean_bc
+	$(MAKE) test R=5 S=t0.txt
 
 vm_demo:
 	$(VM) tests/build/demo-bytecode.txt
