@@ -43,10 +43,13 @@ let rec compile_expr ?(label = "") e env k li =
   | Ederef i -> compile_expr (Eident i) env k li @ ["GETFIELD 0"] @ li
   | Earray [] -> error "empty array"
   | Earray l -> compile_array_expr (List.rev l) env k li @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
-  | Eaget (i,e) -> compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident i) env (k+1) li @  ["GETVECTITEM"] @ li
+  | Eaget (i,e) ->
+    let tmp = "_tmp_" ^ string_of_int (counter ()) in
+      compile_stmt (Sassign (tmp, e, Sif (Ebinop (Bge, (Eident tmp), (Easize i)), Sexit, Sskip))) env li @ 
+        compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident i) env (k+1) li @  ["GETVECTITEM"] @ li
   | Easize i -> compile_expr (Eident i) env k li @ ["VECTLENGTH"] @ li
 
-let rec compile_stmt ?(label = "") s env li =
+  and compile_stmt ?(label = "") s env li =
   match s with
   | Sassign(i,e,s) ->
     if List.mem i env then error ("local var already bound: " ^ i);
