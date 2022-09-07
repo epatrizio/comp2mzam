@@ -70,7 +70,15 @@ let rec type_expr env e =
 
 and type_stmt env s =
   match s with
-  | Sprint e -> type_expr env e
+  | Sprint e -> type_expr env e (* print bool (0/1) or unit (0) is ok *)
+  | Sif (e,s1,s2) -> begin
+      begin match type_expr env e with
+      | Tbool -> Tbool
+      | _ -> error "not boolean type (if condition statement)"
+      end;
+      type_stmt env s1;
+      type_stmt env s2
+    end
   | _ -> error "not implemented (call compiler with --no-typing option)"
 
 let typing stmt =
