@@ -14,7 +14,9 @@ let rec type_expr env e =
   | Ecst Cunit -> Tunit
   | Ecst (Cbool b) -> Tbool
   | Ecst (Cint i) -> Tint
-  | Eident i -> Tmap.find i env
+  | Eident i -> begin
+      try Tmap.find i env with Not_found -> error ("unbound local var: " ^ i)
+    end
   | Eunop (Unot,(Ecst (Cbool b))) -> Tbool
   | Eunop (Unot,(Ecst _)) -> error "not boolean type (unop)"
   | Eunop (Unot,e) -> type_expr env e
@@ -95,6 +97,7 @@ let rec type_expr env e =
 and type_stmt env s =
   match s with
   | Sassign(i,e,s) -> let env = Tmap.add i (type_expr env e) env in type_stmt env s
+  | Sblock b -> type_block env b
   | Sprint e -> type_expr env e (* print bool (0/1) or unit (0) is ok *)
   | Sif (e,s1,s2) -> begin
       begin match type_expr env e with
@@ -105,6 +108,12 @@ and type_stmt env s =
       type_stmt env s2
     end
   | _ -> error "not implemented (call compiler with --no-typing option)"
+
+and type_block env b =
+  match b with
+  | Bstmt s -> type_stmt env s
+  | Bseq_l (s,b) -> type_stmt env s; type_block env b
+  | Bseq_r (b,s) -> type_block env b; type_stmt env s
 
 let typing stmt =
   let env = Tmap.empty in
