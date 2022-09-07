@@ -33,7 +33,39 @@ let rec type_expr env e =
           | _ -> error "not boolean type (or binop)"
           end
       | _ -> error "not boolean type (or binop)"
-    end
+      end
+  | Ebinop (Badd,e1,e2) -> begin match type_expr env e1 with
+      | Tint ->
+          begin match type_expr env e2 with
+          | Tint -> Tint
+          | _ -> error "not integer type (add binop)"
+          end
+      | _ -> error "not integer type (add binop)"
+      end
+  | Ebinop (Bsub,e1,e2) -> begin match type_expr env e1 with
+      | Tint ->
+          begin match type_expr env e2 with
+          | Tint -> Tint
+          | _ -> error "not integer type (sub binop)"
+          end
+      | _ -> error "not integer type (sub binop)"
+      end
+  | Ebinop (Bmul,e1,e2) -> begin match type_expr env e1 with
+      | Tint ->
+          begin match type_expr env e2 with
+          | Tint -> Tint
+          | _ -> error "not integer type (mul binop)"
+          end
+      | _ -> error "not integer type (mul binop)"
+      end
+  | Ebinop (Bdiv,e1,e2) -> begin match type_expr env e1 with
+      | Tint ->
+          begin match type_expr env e2 with
+          | Tint -> Tint
+          | _ -> error "not integer type (div binop)"
+          end
+      | _ -> error "not integer type (div binop)"
+      end
   | _ -> error "not implemented (call compiler with --no-typing option)"
 
 and type_stmt env s =
