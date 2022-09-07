@@ -66,6 +66,30 @@ let rec type_expr env e =
           end
       | _ -> error "not integer type (div binop)"
       end
+  | Ebinop (Beq,e1,e2) ->
+      let ty1 = type_expr env e1 in
+      let ty2 = type_expr env e2 in
+        if ty1 == ty2 then Tbool else error "not identic type (equals comparaison binop)"
+  | Ebinop (Bneq,e1,e2) ->
+    let ty1 = type_expr env e1 in
+    let ty2 = type_expr env e2 in
+      if ty1 == ty2 then Tbool else error "not identic type (diff comparaison binop)"
+  | Ebinop (Blt,e1,e2) ->
+      let ty1 = type_expr env e1 in
+      let ty2 = type_expr env e2 in
+        if ty1 == Tint && ty2 == Tint then Tbool else error "not integer type (< comparaison binop)"
+  | Ebinop (Ble,e1,e2) ->
+    let ty1 = type_expr env e1 in
+    let ty2 = type_expr env e2 in
+      if ty1 == Tint && ty2 == Tint then Tbool else error "not integer type (<= comparaison binop)"
+  | Ebinop (Bgt,e1,e2) ->
+    let ty1 = type_expr env e1 in
+    let ty2 = type_expr env e2 in
+      if ty1 == Tint && ty2 == Tint then Tbool else error "not integer type (> comparaison binop)"
+  | Ebinop (Bge,e1,e2) ->
+    let ty1 = type_expr env e1 in
+    let ty2 = type_expr env e2 in
+      if ty1 == Tint && ty2 == Tint then Tbool else error "not integer type (>= comparaison binop)"
   | _ -> error "not implemented (call compiler with --no-typing option)"
 
 and type_stmt env s =
