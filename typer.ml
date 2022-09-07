@@ -94,6 +94,7 @@ let rec type_expr env e =
 
 and type_stmt env s =
   match s with
+  | Sassign(i,e,s) -> let env = Tmap.add i (type_expr env e) env in type_stmt env s
   | Sprint e -> type_expr env e (* print bool (0/1) or unit (0) is ok *)
   | Sif (e,s1,s2) -> begin
       begin match type_expr env e with
