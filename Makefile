@@ -14,8 +14,10 @@ all:
 	ocamlc -c parser.mli;
 	ocamlc -c parser.ml;
 	ocamlc -c lexer.ml;
+	ocamlc -c tast.ml;
+	ocamlc -c typer.ml;
 	ocamlc -c main.ml;
-	ocamlc -o $(EXE) utils.cmo ast.cmo compiler.cmo lexer.cmo parser.cmo main.cmo
+	ocamlc -o $(EXE) utils.cmo ast.cmo tast.cmo compiler.cmo lexer.cmo parser.cmo typer.cmo main.cmo
 
 clean:
 	rm -rf *.cmo *.cmi lexer.ml parser.ml parser.mli $(EXE)
@@ -29,6 +31,9 @@ check_grammar:
 compile:
 	@./$(EXE) tests/$(S)
 
+compile_no_typing:
+	@./$(EXE) --no-typing tests/$(S)
+
 vm:
 	@$(VM) tests/build/bc_$(S)
 
@@ -37,7 +42,11 @@ vm_debug:
 
 cvm: compile vm
 
+cvm_no_typing: compile_no_typing vm
+
 cvm_debug: compile vm_debug
+
+cvm_debug_no_typing: compile_no_typing vm_debug
 
 test:
 	$(eval RES := $(shell S=$(S) make cvm))

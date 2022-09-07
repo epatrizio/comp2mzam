@@ -2,6 +2,11 @@
 
 type ident = string
 
+type typ =
+  | Tunit
+  | Tbool
+  | Tint
+
 type unop =
   | Unot (* not e *)
 
