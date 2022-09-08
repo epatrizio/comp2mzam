@@ -1,0 +1,6 @@
+let x = (ref 42) in
+let y = (ref true) in
+begin
+  x := ((!x) + (!y)); (* error *)
+  print (!x)
+end

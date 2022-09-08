@@ -92,11 +92,17 @@ let rec type_expr env e =
     let ty1 = type_expr env e1 in
     let ty2 = type_expr env e2 in
       if ty1 == Tint && ty2 == Tint then Tbool else error "not integer type (>= comparaison binop)"
+  | Eref e -> type_expr env e
+  | Ederef i -> type_expr env (Eident i)
   | _ -> error "not implemented (call compiler with --no-typing option)"
 
 and type_stmt env s =
   match s with
   | Sassign(i,e,s) -> let env = Tmap.add i (type_expr env e) env in type_stmt env s
+  | Srefassign(i,e) -> 
+    let ty1 = type_expr env (Eident i) in
+    let ty2 = type_expr env e in
+      if ty1 == ty2 then Tunit else error "not identic type (ref assign)"
   | Sblock b -> type_block env b
   | Sprint e -> type_expr env e (* print bool (0/1) or unit (0) is ok *)
   | Sif (e,s1,s2) -> begin
