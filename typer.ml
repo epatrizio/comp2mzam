@@ -104,6 +104,10 @@ and type_stmt env s =
     let ty2 = type_expr env e in
       if ty1 == ty2 then Tunit else error "not identic type (ref assign)"
   | Sblock b -> type_block env b
+  | Sfor (s1,e,s2,b) -> begin match type_expr env e with
+      | Tbool -> type_stmt env s1; type_stmt env s2; type_block env b
+      | _ -> error "not boolean type (for statement condition)"
+      end
   | Sprint e -> type_expr env e (* print bool (0/1) or unit (0) is ok *)
   | Sif (e,s1,s2) -> begin
       begin match type_expr env e with
