@@ -10,6 +10,12 @@ module Tmap = Map.Make(String)
 type environment = typ Tmap.t
 
 let rec type_expr env e =
+  let elts_same_types = function
+    | [] -> (Tunit,true)
+    | [e] -> (type_expr env e,true)
+    | e1 :: rlist -> let acc = (type_expr env e1,true) in
+        List.fold_left (fun (ty,ok) e -> (ty,(ok && (ty == type_expr env e)))) acc rlist
+  in
   match e with
   | Ecst Cunit -> Tunit
   | Ecst (Cbool b) -> Tbool
@@ -94,6 +100,32 @@ let rec type_expr env e =
       if ty1 == Tint && ty2 == Tint then Tbool else error "not integer type (>= comparaison binop)"
   | Eref e -> type_expr env e
   | Ederef i -> type_expr env (Eident i)
+  | Earray [] -> error "empty array"
+  | Earray l -> let (ty,b) = elts_same_types l in
+      begin match b with
+      | true -> begin match ty with
+        | Tint -> Taint
+        | Tbool -> Tabool
+        | Tunit -> error "unit type not authorized (array create)"
+        | _ -> error "array of array type not supported (array create)"
+        end
+      | false -> error "not identic type (array create)"
+      end
+  | Eaget (i,e) ->
+      let tya = type_expr env (Eident i) in
+        begin match type_expr env e with
+        | Tint -> begin match tya with
+          | Taint -> Tint
+          | Tabool -> Tbool
+          | _ -> error "incoherent array type (array accessor)"
+          end
+        | _ -> error "not integer type (array accessor)"
+        end
+  | Easize i -> begin match type_expr env (Eident i) with
+      | Taint -> Tint
+      | Tabool -> Tint
+      | _ -> error "not array type (array_size primitive)"
+      end
   | _ -> error "not implemented (call compiler with --no-typing option)"
 
 and type_stmt env s =
@@ -103,6 +135,16 @@ and type_stmt env s =
     let ty1 = type_expr env (Eident i) in
     let ty2 = type_expr env e in
       if ty1 == ty2 then Tunit else error "not identic type (ref assign)"
+  | Saassign(i,e1,e2) ->
+      let tya = type_expr env (Eident i) in
+        begin match type_expr env e1 with
+          | Tint -> begin match type_expr env e2 with
+            | Tint -> if tya == Taint then Tunit else error "not integer type (array element assign)"
+            | Tbool -> if tya == Tabool then Tunit else error "not boolean type (array element assign)"
+            | _ -> error "incoherent type (array element assign)"
+            end
+          | _ -> error "not integer type (array assign accessor)"
+          end
   | Sblock b -> type_block env b
   | Swhile (e,b) -> begin match type_expr env e with
       | Tbool -> type_block env b
