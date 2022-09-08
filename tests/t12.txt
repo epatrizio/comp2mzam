@@ -1,4 +1,4 @@
-let i = (ref ()) in
+let i = (ref 0) in
 begin
   print 42;
   skip;
