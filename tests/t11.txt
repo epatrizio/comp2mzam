@@ -1,4 +1,4 @@
-let i = (ref ()) in
+let i = (ref 0) in
 begin
   while ((!i) < 10) do
     print (!i);

@@ -104,6 +104,10 @@ and type_stmt env s =
     let ty2 = type_expr env e in
       if ty1 == ty2 then Tunit else error "not identic type (ref assign)"
   | Sblock b -> type_block env b
+  | Swhile (e,b) -> begin match type_expr env e with
+      | Tbool -> type_block env b
+      | _ -> error "not boolean type (while statement condition)"
+      end
   | Sfor (s1,e,s2,b) -> begin match type_expr env e with
       | Tbool -> type_stmt env s1; type_stmt env s2; type_block env b
       | _ -> error "not boolean type (for statement condition)"
@@ -117,6 +121,8 @@ and type_stmt env s =
       type_stmt env s1;
       type_stmt env s2
     end
+  | Sexit -> Tunit
+  | Sskip -> Tunit
   | _ -> error "not implemented (call compiler with --no-typing option)"
 
 and type_block env b =
