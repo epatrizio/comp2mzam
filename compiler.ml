@@ -81,7 +81,7 @@ let compile stmt in_file_name =
   let oc = open_out ("tests/build/bc_" ^ (Filename.basename in_file_name)) in
   let fmt = Format.formatter_of_out_channel oc in
   let inst_processing si =
-    if String.starts_with "LABEL" si then
+    if String.starts_with ~prefix:"LABEL" si then
       let sl = String.split_on_char ';' si in
       let label_inst = List.hd sl in
       let label = String.sub label_inst 6 ((String.length label_inst) - 6) in
@@ -91,7 +91,7 @@ let compile stmt in_file_name =
       Format.fprintf fmt "\t%s\n" si
   in
   let insts_processing li =
-    List.map (fun s -> inst_processing s) li;
+    let _ = List.map (fun s -> inst_processing s) li in
     Format.fprintf fmt "@."
   in
   let insts = compile_prog stmt in

@@ -1,12 +1,22 @@
 open Format
 open Utils
 
-let process source_code_file =
+let no_typing = ref false
+
+let in_file_name = ref ""
+let set_file s = in_file_name := s
+
+let options = ["--no-typing", Arg.Set no_typing, " Compile without typing checks"]
+
+let usage = "usage: ./c2mz [options] tests/bc_(test).txt"
+
+let process source_code_file no_typing =
     let ic = open_in source_code_file in
     let lexbuf = Lexing.from_channel ic in
   try
     let ast = Parser.prog Lexer.token lexbuf in
       close_in ic;
+      if not no_typing then Typer.typing ast;
       Compiler.compile ast source_code_file
   with
     | Lexer.Lexing_error c -> 
@@ -17,11 +27,18 @@ let process source_code_file =
         localisation (Lexing.lexeme_start_p lexbuf) source_code_file;
         eprintf "Syntax error@.";
         exit 1
+    | Typer.Error s ->
+        eprintf "Typing error: %s@." s;
+        exit 1
     | Compiler.Error s ->
         eprintf "Compilation error: %s@." s;
         exit 1
 
 let _ =
-  for i = 1 to Array.length Sys.argv - 1 do
-    process Sys.argv.(i)
-  done
+  Arg.parse options set_file usage;
+  if !in_file_name="" then begin
+    eprintf "init error: missing test file name to compile!\n@?";
+    Arg.usage options usage;
+    exit 1
+  end;
+  process !in_file_name !no_typing

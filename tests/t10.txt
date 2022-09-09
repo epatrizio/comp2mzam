@@ -1,5 +1,5 @@
-let i = (ref ()) in
-let tmp = (ref ()) in
+let i = (ref 0) in
+let tmp = (ref 0) in
 let coef = 10 in
 begin
   print (!i);

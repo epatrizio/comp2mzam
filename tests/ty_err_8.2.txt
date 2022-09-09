@@ -1,0 +1,10 @@
+let x = (ref (40+2)) in
+let y = (ref ((!x)*false)) in (* error *)
+let z = true in
+  begin
+    print (!x);
+    print (!y);
+    print ((!y)/2);
+    print z;
+    print ((!x)+z) (* error *)
+  end
