@@ -6,6 +6,12 @@
 
   exception Lexing_error of string
   let error message = raise (Lexing_error message)
+
+  let newline lexbuf =
+    let pos = lexbuf.lex_curr_p in
+      lexbuf.lex_curr_p <- {
+        pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum; pos_cnum = 0
+      }
 }
 
 let letter = ['a'-'z' 'A'-'Z']
@@ -65,12 +71,12 @@ rule token = parse
   | unit          { CST Cunit }
   | ident as s    { IDENT(s) }
   | spaces        { token lexbuf }
-  | newline       { token lexbuf }
+  | newline       { newline lexbuf; token lexbuf }
   | eof           { EOF }
   | _ as lxm      { error ("unexpected character: " ^ (Char.escaped lxm)) }
 
 and comment = parse
   | "*)"          { token lexbuf }
-  | newline       { comment lexbuf }
+  | newline       { newline lexbuf; comment lexbuf }
   | _             { comment lexbuf }
   | eof           { error "unterminated comment" }
