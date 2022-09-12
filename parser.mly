@@ -37,12 +37,12 @@ prog : s=stmt EOF { s };
 
 stmt :
      | BEGIN b=block END { Ast.Sblock b }
-     | LET i=IDENT EQUAL e=expr IN s=stmt { Ast.Sassign(i, e, s) }
-     | i=IDENT REF_EQUAL e=expr { Ast.Srefassign(i, e) }
-     | i=IDENT LSQ e1=expr RSQ REF_EQUAL e2=expr { Ast.Saassign(i, e1, e2) }
-     | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (e, s1, s2) }
-     | WHILE e=expr DO b=block DONE { Ast.Swhile (e, b) }
-     | FOR s1=stmt SEMICOLON e=expr SEMICOLON s2=stmt DO b=block DONE { Ast.Sfor (s1, e, s2, b) }
+     | LET i=IDENT EQUAL e=expr IN s=stmt { Ast.Sassign(($startpos,$endpos), i, e, s) }
+     | i=IDENT REF_EQUAL e=expr { Ast.Srefassign(($startpos,$endpos), i, e) }
+     | i=IDENT LSQ e1=expr RSQ REF_EQUAL e2=expr { Ast.Saassign(($startpos,$endpos), i, e1, e2) }
+     | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (($startpos,$endpos), e, s1, s2) }
+     | WHILE e=expr DO b=block DONE { Ast.Swhile (($startpos,$endpos), e, b) }
+     | FOR s1=stmt SEMICOLON e=expr SEMICOLON s2=stmt DO b=block DONE { Ast.Sfor (($startpos,$endpos), s1, e, s2, b) }
      | PRINT e=expr { Ast.Sprint e }
      | EXIT { Ast.Sexit }
      | SKIP { Ast.Sskip }
@@ -55,26 +55,26 @@ block :
      ;
 
 expr :
-     | c=CST { Ast.Ecst c }
-     | i=IDENT { Ast.Eident i }
+     | c=CST { Ast.Ecst (($startpos,$endpos), c) }
+     | i=IDENT { Ast.Eident (($startpos,$endpos), i) }
      | LP NOT e=expr RP { Ast.Eunop (($startpos,$endpos), Unot, e) }
-     | LP e1=expr PLUS e2=expr RP { Ast.Ebinop (Badd, e1, e2) }
-     | LP e1=expr MINUS e2=expr RP { Ast.Ebinop (Bsub, e1, e2) }
-     | LP e1=expr MULT e2=expr RP { Ast.Ebinop (Bmul, e1, e2) }
-     | LP e1=expr DIV e2=expr RP { Ast.Ebinop (Bdiv, e1, e2) }
-     | LP e1=expr CMP_EQ e2=expr RP { Ast.Ebinop (Beq, e1, e2) }
-     | LP e1=expr CMP_NEQ e2=expr RP { Ast.Ebinop (Bneq, e1, e2) }
-     | LP e1=expr CMP_LT e2=expr RP { Ast.Ebinop (Blt, e1, e2) }
-     | LP e1=expr CMP_LE e2=expr RP { Ast.Ebinop (Ble, e1, e2) }
-     | LP e1=expr CMP_GT e2=expr RP { Ast.Ebinop (Bgt, e1, e2) }
-     | LP e1=expr CMP_GE e2=expr RP { Ast.Ebinop (Bge, e1, e2) }
-     | LP e1=expr AND e2=expr RP { Ast.Ebinop (Band, e1, e2) }
-     | LP e1=expr OR e2=expr RP { Ast.Ebinop (Bor, e1, e2) }
-     | LP REF e=expr RP { Ast.Eref e }
-     | LP EXCL i=IDENT RP { Ast.Ederef i }
-     | LCU l=expr_list RCU { Ast.Earray l }
-     | i=IDENT LSQ e=expr RSQ { Ast.Eaget (i, e) }
-     | LP ARRAY_SIZE i=IDENT RP { Ast.Easize i }
+     | LP e1=expr PLUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Badd, e1, e2) }
+     | LP e1=expr MINUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bsub, e1, e2) }
+     | LP e1=expr MULT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bmul, e1, e2) }
+     | LP e1=expr DIV e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bdiv, e1, e2) }
+     | LP e1=expr CMP_EQ e2=expr RP { Ast.Ebinop (($startpos,$endpos), Beq, e1, e2) }
+     | LP e1=expr CMP_NEQ e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bneq, e1, e2) }
+     | LP e1=expr CMP_LT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Blt, e1, e2) }
+     | LP e1=expr CMP_LE e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ble, e1, e2) }
+     | LP e1=expr CMP_GT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bgt, e1, e2) }
+     | LP e1=expr CMP_GE e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bge, e1, e2) }
+     | LP e1=expr AND e2=expr RP { Ast.Ebinop (($startpos,$endpos), Band, e1, e2) }
+     | LP e1=expr OR e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bor, e1, e2) }
+     | LP REF e=expr RP { Ast.Eref (($startpos,$endpos), e) }
+     | LP EXCL i=IDENT RP { Ast.Ederef (($startpos,$endpos), i) }
+     | LCU l=expr_list RCU { Ast.Earray (($startpos,$endpos), l) }
+     | i=IDENT LSQ e=expr RSQ { Ast.Eaget (($startpos,$endpos), i, e) }
+     | LP ARRAY_SIZE i=IDENT RP { Ast.Easize (($startpos,$endpos), i) }
      ;
 
 expr_list :
