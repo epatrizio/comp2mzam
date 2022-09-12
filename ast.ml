@@ -1,5 +1,7 @@
 (* Abstract Syntax Tree *)
 
+type loc = Lexing.position * Lexing.position
+
 type ident = string
 
 type typ =
@@ -27,13 +29,13 @@ type expr =
   | Eident of ident
   | Eref of expr
   | Ederef of ident
-  | Eunop of unop * expr
+  | Eunop of loc * unop * expr
   | Ebinop of binop * expr * expr
   | Earray of expr list
   | Eaget of ident * expr
   | Easize of ident
 
-and stmt =
+type stmt =
   | Sassign of ident * expr * stmt
   | Srefassign of ident * expr
   | Saassign of ident * expr * expr

@@ -57,7 +57,7 @@ block :
 expr :
      | c=CST { Ast.Ecst c }
      | i=IDENT { Ast.Eident i }
-     | LP NOT e=expr RP { Ast.Eunop (Unot, e) }
+     | LP NOT e=expr RP { Ast.Eunop (($startpos,$endpos), Unot, e) }
      | LP e1=expr PLUS e2=expr RP { Ast.Ebinop (Badd, e1, e2) }
      | LP e1=expr MINUS e2=expr RP { Ast.Ebinop (Bsub, e1, e2) }
      | LP e1=expr MULT e2=expr RP { Ast.Ebinop (Bmul, e1, e2) }

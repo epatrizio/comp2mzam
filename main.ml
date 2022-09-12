@@ -30,6 +30,11 @@ let process source_code_file no_typing =
     | Typer.Error s ->
         eprintf "Typing error: %s@." s;
         exit 1
+    | Typer.ErrorLoc ((l1,l2),s) ->
+        localisation l1 source_code_file;
+        localisation l2 source_code_file;
+        eprintf "Typing error: %s@." s;
+        exit 1
     | Compiler.Error s ->
         eprintf "Compilation error: %s@." s;
         exit 1

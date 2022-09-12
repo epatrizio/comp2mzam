@@ -5,6 +5,9 @@ open Ast
 exception Error of string
 let error message = raise (Error message)
 
+exception ErrorLoc of loc * string
+let error_loc loc message = raise (ErrorLoc (loc,message))
+
 module Tmap = Map.Make(String)
 
 type environment = typ Tmap.t
@@ -23,9 +26,9 @@ let rec type_expr env e =
   | Eident i -> begin
       try Tmap.find i env with Not_found -> error ("unbound local var: " ^ i)
     end
-  | Eunop (Unot,(Ecst (Cbool b))) -> Tbool
-  | Eunop (Unot,(Ecst _)) -> error "not boolean type (unop)"
-  | Eunop (Unot,e) -> type_expr env e
+  | Eunop (_,Unot,(Ecst (Cbool b))) -> Tbool
+  | Eunop (loc,Unot,(Ecst _)) -> error_loc loc "not boolean type (unop)"
+  | Eunop (_,Unot,e) -> type_expr env e
   | Ebinop (Band,e1,e2) -> begin match type_expr env e1 with
       | Tbool ->
           begin match type_expr env e2 with
