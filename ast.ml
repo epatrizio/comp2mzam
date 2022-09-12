@@ -1,5 +1,7 @@
 (* Abstract Syntax Tree *)
 
+type loc = Lexing.position * Lexing.position
+
 type ident = string
 
 type typ =
@@ -23,24 +25,24 @@ type constant =
   | Cint of int
 
 type expr =
-  | Ecst of constant
-  | Eident of ident
-  | Eref of expr
-  | Ederef of ident
-  | Eunop of unop * expr
-  | Ebinop of binop * expr * expr
-  | Earray of expr list
-  | Eaget of ident * expr
-  | Easize of ident
+  | Ecst of loc * constant
+  | Eident of loc * ident
+  | Eref of loc * expr
+  | Ederef of loc * ident
+  | Eunop of loc * unop * expr
+  | Ebinop of loc * binop * expr * expr
+  | Earray of loc * expr list
+  | Eaget of loc * ident * expr
+  | Easize of loc * ident
 
-and stmt =
-  | Sassign of ident * expr * stmt
-  | Srefassign of ident * expr
-  | Saassign of ident * expr * expr
+type stmt =
+  | Sassign of loc * ident * expr * stmt
+  | Srefassign of loc * ident * expr
+  | Saassign of loc * ident * expr * expr
   | Sblock of block
-  | Sif of expr * stmt * stmt
-  | Swhile of expr * block
-  | Sfor of stmt * expr * stmt * block
+  | Sif of loc * expr * stmt * stmt
+  | Swhile of loc * expr * block
+  | Sfor of loc * stmt * expr * stmt * block
   | Sprint of expr
   | Sexit
   | Sskip

@@ -14,10 +14,9 @@ all:
 	ocamlc -c parser.mli;
 	ocamlc -c parser.ml;
 	ocamlc -c lexer.ml;
-	ocamlc -c tast.ml;
 	ocamlc -c typer.ml;
 	ocamlc -c main.ml;
-	ocamlc -o $(EXE) utils.cmo ast.cmo tast.cmo compiler.cmo lexer.cmo parser.cmo typer.cmo main.cmo
+	ocamlc -o $(EXE) utils.cmo ast.cmo compiler.cmo lexer.cmo parser.cmo typer.cmo main.cmo
 
 clean:
 	rm -rf *.cmo *.cmi lexer.ml parser.ml parser.mli $(EXE)

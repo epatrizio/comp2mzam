@@ -27,11 +27,17 @@ let process source_code_file no_typing =
         localisation (Lexing.lexeme_start_p lexbuf) source_code_file;
         eprintf "Syntax error@.";
         exit 1
-    | Typer.Error s ->
+    | Typer.Error ((l1,l2),s) ->
+        localisation l1 source_code_file;
+        localisation l2 source_code_file;
         eprintf "Typing error: %s@." s;
+        extract_in_file source_code_file l1 l2;
         exit 1
-    | Compiler.Error s ->
+    | Compiler.Error ((l1,l2),s) ->
+        localisation l1 source_code_file;
+        localisation l2 source_code_file;
         eprintf "Compilation error: %s@." s;
+        extract_in_file source_code_file l1 l2;
         exit 1
 
 let _ =
