@@ -10,6 +10,7 @@ type typ =
   | Tint
   | Tabool
   | Taint
+  | Tunknown
 
 type unop =
   | Unot (* not e *)
@@ -25,7 +26,7 @@ type constant =
   | Cint of int
 
 type expr =
-  | Ecst of loc * constant
+  | Ecst of loc * typ * constant
   | Eident of loc * ident
   | Eref of loc * expr
   | Ederef of loc * ident

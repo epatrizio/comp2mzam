@@ -16,8 +16,8 @@ let process source_code_file no_typing =
   try
     let ast = Parser.prog Lexer.token lexbuf in
       close_in ic;
-      if not no_typing then Typer.typing ast;
-      Compiler.compile ast source_code_file
+      let ast = if not no_typing then Typer.typing ast else ast in
+        Compiler.compile ast source_code_file
   with
     | Lexer.Lexing_error c -> 
         localisation (Lexing.lexeme_start_p lexbuf) source_code_file;

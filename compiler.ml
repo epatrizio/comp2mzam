@@ -19,9 +19,9 @@ let rec compile_expr ?(label = "") e env k li =
     | e::es -> compile_expr e env k li @ ["PUSH"] @ compile_array_expr es env k li loc
   in
   match e with
-  | Ecst (_,(Cbool b)) -> labeled_inst ~label:label (if b then "CONST 1" else "CONST 0") @ li
-  | Ecst (_,(Cint i)) -> labeled_inst ~label:label ("CONST " ^ string_of_int i) @ li
-  | Ecst (_,Cunit) -> labeled_inst ~label:label ("CONST 0") @ li
+  | Ecst (_,_,(Cbool b)) -> labeled_inst ~label:label (if b then "CONST 1" else "CONST 0") @ li
+  | Ecst (_,_,(Cint i)) -> labeled_inst ~label:label ("CONST " ^ string_of_int i) @ li
+  | Ecst (_,_,Cunit) -> labeled_inst ~label:label ("CONST 0") @ li
   | Eident (loc,i) ->
     if not (List.mem i env) then error loc ("unbound local var: " ^ i);
     ["ACC " ^ string_of_int ((pos_list env i) + k)] @ li
@@ -29,7 +29,7 @@ let rec compile_expr ?(label = "") e env k li =
   | Ebinop (_,Badd,e1,e2) -> compile_binop_expr e1 e2 "+" env k li @ li
   | Ebinop (_,Bsub,e1,e2) -> compile_binop_expr e1 e2 "-" env k li @ li
   | Ebinop (_,Bmul,e1,e2) -> compile_binop_expr e1 e2 "*" env k li @ li
-  | Ebinop (loc,Bdiv,e1,Ecst (_,Cint 0)) -> error loc "division by zero"
+  | Ebinop (loc,Bdiv,e1,Ecst (_,_,Cint 0)) -> error loc "division by zero"
   | Ebinop (_,Bdiv,e1,e2) -> compile_binop_expr e1 e2 "/" env k li @ li
   | Ebinop (_,Beq,e1,e2) -> compile_binop_expr e1 e2 "=" env k li @ li
   | Ebinop (_,Bneq,e1,e2) -> compile_binop_expr e1 e2 "<>" env k li @ li

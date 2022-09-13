@@ -10,6 +10,11 @@ module Tmap = Map.Make(String)
 
 type environment = typ Tmap.t
 
+let type_expr_deco e typ =
+  match e with
+  | Ecst (loc,_,c) -> Ecst (loc,typ,c)
+  | exp -> exp
+
 let rec type_expr env e =
   let elts_same_types = function
     | [] -> (Tunit,true)
@@ -18,13 +23,13 @@ let rec type_expr env e =
         List.fold_left (fun (ty,ok) e -> (ty,(ok && (ty == type_expr env e)))) acc rlist
   in
   match e with
-  | Ecst (_,Cunit) -> Tunit
-  | Ecst (_,(Cbool b)) -> Tbool
-  | Ecst (_,(Cint i)) -> Tint
+  | Ecst (_,_,Cunit) -> Tunit
+  | Ecst (_,_,(Cbool _)) -> Tbool
+  | Ecst (_,_,(Cint _)) -> Tint
   | Eident (loc,i) -> begin
       try Tmap.find i env with Not_found -> error loc ("unbound local var: " ^ i)
     end
-  | Eunop (_,Unot,(Ecst (_,(Cbool b)))) -> Tbool
+  | Eunop (_,Unot,(Ecst (_,_,(Cbool _)))) -> Tbool
   | Eunop (loc,Unot,(Ecst _)) -> error loc "not boolean type (unop)"
   | Eunop (_,Unot,e) -> type_expr env e
   | Ebinop (loc,Band,e1,e2) -> begin match type_expr env e1 with
@@ -130,49 +135,70 @@ let rec type_expr env e =
 
 and type_stmt env s =
   begin match s with
-  | Sassign(_,i,e,s) -> let env = Tmap.add i (type_expr env e) env in type_stmt env s
+  | Sassign(loc,i,e,s) ->
+      let typ = type_expr env e in
+      let env = Tmap.add i typ env in
+        Sassign(loc,i,type_expr_deco e typ,type_stmt env s)
   | Srefassign(loc,i,e) -> 
-    let ty1 = type_expr env (Eident (loc,i)) in
-    let ty2 = type_expr env e in
-      if ty1 == ty2 then () else error loc "not identic type (ref assign)"
+      let ty1 = type_expr env (Eident (loc,i)) in
+      let ty2 = type_expr env e in
+        if ty1 == ty2 then Srefassign(loc,i,type_expr_deco e ty2)
+        else error loc "not identic type (ref assign)"
   | Saassign(loc,i,e1,e2) ->
       let tya = type_expr env (Eident (loc,i)) in
-        begin match type_expr env e1 with
-          | Tint -> begin match type_expr env e2 with
-            | Tint -> if tya == Taint then () else error loc "not integer type (array element assign)"
-            | Tbool -> if tya == Tabool then () else error loc "not boolean type (array element assign)"
+      let ty1 = type_expr env e1 in
+      let ty2 = type_expr env e2 in
+        begin match ty1 with
+          | Tint -> begin match ty2 with
+            | Tint ->
+                if tya == Taint then Saassign(loc,i,type_expr_deco e1 ty1,type_expr_deco e2 ty2)
+                else error loc "not integer type (array element assign)"
+            | Tbool ->
+                if tya == Tabool then Saassign(loc,i,type_expr_deco e1 ty1,type_expr_deco e2 ty2)
+                else error loc "not boolean type (array element assign)"
             | _ -> error loc "incoherent type (array element assign)"
             end
           | _ -> error loc "not integer type (array assign accessor)"
           end
-  | Sblock b -> type_block env b
-  | Swhile (loc,e,b) -> begin match type_expr env e with
-      | Tbool -> type_block env b
-      | _ -> error loc "not boolean type (while statement condition)"
-      end
-  | Sfor (loc,s1,e,s2,b) -> begin match type_expr env e with
-      | Tbool -> type_stmt env s1; type_stmt env s2; type_block env b
-      | _ -> error loc "not boolean type (for statement condition)"
-      end
-  | Sprint e -> let _ = type_expr env e in () (* print bool (0/1) or unit (0) is ok *)
+  | Sblock b -> Sblock (type_block env b)
+  | Swhile (loc,e,b) ->
+      let typ = type_expr env e in
+        begin match typ with
+        | Tbool -> Swhile (loc,type_expr_deco e typ,type_block env b)
+        | _ -> error loc "not boolean type (while statement condition)"
+        end
+  | Sfor (loc,s1,e,s2,b) ->
+      let typ = type_expr env e in
+        begin match typ with
+        | Tbool -> Sfor (loc,
+            type_stmt env s1,
+            type_expr_deco e typ,
+            type_stmt env s2,
+            type_block env b)
+        | _ -> error loc "not boolean type (for statement condition)"
+        end
+  | Sprint e -> Sprint (type_expr_deco e (type_expr env e)) (* print bool (0/1) or unit (0) is ok *)
   | Sif (loc,e,s1,s2) -> begin
-      begin match type_expr env e with
-      | Tbool -> ()
-      | _ -> error loc "not boolean type (if condition statement)"
-      end;
-      type_stmt env s1;
-      type_stmt env s2
-    end
-  | Sexit -> ()
-  | Sskip -> ()
+      let typ = type_expr env e in
+        begin match typ with
+        | Tbool -> Sif (loc,
+              type_expr_deco e typ,
+              type_stmt env s1,
+              type_stmt env s2
+            )
+        | _ -> error loc "not boolean type (if condition statement)"
+        end
+      end
+  | Sexit -> Sexit
+  | Sskip -> Sskip
   end
 
 and type_block env b =
   match b with
-  | Bstmt s -> type_stmt env s
-  | Bseq_l (s,b) -> type_stmt env s; type_block env b
-  | Bseq_r (b,s) -> type_block env b; type_stmt env s
+  | Bstmt s -> Bstmt (type_stmt env s)
+  | Bseq_l (s,b) -> Bseq_l (type_stmt env s, type_block env b)
+  | Bseq_r (b,s) -> Bseq_r (type_block env b, type_stmt env s)
 
-let typing stmt =
+let typing ast_stmt =
   let env = Tmap.empty in
-    type_stmt env stmt
+    type_stmt env ast_stmt
