@@ -22,7 +22,7 @@ let rec compile_expr ?(label = "") e env k li =
   | Ecst (_,_,(Cbool b)) -> labeled_inst ~label:label (if b then "CONST 1" else "CONST 0") @ li
   | Ecst (_,_,(Cint i)) -> labeled_inst ~label:label ("CONST " ^ string_of_int i) @ li
   | Ecst (_,_,Cunit) -> labeled_inst ~label:label ("CONST 0") @ li
-  | Eident (loc,i) ->
+  | Eident (loc,_,(_,i)) ->
     if not (List.mem i env) then error loc ("unbound local var: " ^ i);
     ["ACC " ^ string_of_int ((pos_list env i) + k)] @ li
   | Eunop (_,Unot,e) -> compile_expr e env k li @ ["PRIM not"] @ li
@@ -40,23 +40,23 @@ let rec compile_expr ?(label = "") e env k li =
   | Ebinop (_,Band,e1,e2) -> compile_binop_expr e1 e2 "&" env k li @ li
   | Ebinop (_,Bor,e1,e2) -> compile_binop_expr e1 e2 "or" env k li @ li
   | Eref (_,e) -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
-  | Ederef (loc,i) -> compile_expr (Eident (loc,i)) env k li @ ["GETFIELD 0"] @ li
+  | Ederef (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["GETFIELD 0"] @ li
   | Earray (loc,[]) -> error loc "empty array"
   | Earray (loc,l) -> compile_array_expr (List.rev l) env k li loc @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
-  | Eaget (loc,i,e) ->
+  | Eaget (loc,_,(typ,i),e) ->
     let tmp = "_tmp_" ^ string_of_int (counter ()) in
-      compile_stmt (Sassign (loc, tmp, e, Sif (loc, Ebinop (loc, Bge, (Eident (loc,tmp)), (Easize (loc,i))), Sexit, Sskip))) env li @ 
-        compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident (loc,i)) env (k+1) li @  ["GETVECTITEM"] @ li
-  | Easize (loc,i) -> compile_expr (Eident (loc,i)) env k li @ ["VECTLENGTH"] @ li
+      compile_stmt (Sassign (loc, (typ,tmp), e, Sif (loc, Ebinop (loc, Bge, (Eident (loc,typ,(typ,tmp))), (Easize (loc,Tint,(typ,i)))), Sexit, Sskip))) env li @ 
+        compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident (loc,typ,(typ,i))) env (k+1) li @  ["GETVECTITEM"] @ li
+  | Easize (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["VECTLENGTH"] @ li
 
   and compile_stmt ?(label = "") s env li =
   match s with
-  | Sassign(loc,i,e,s) ->
+  | Sassign(loc,(_,i),e,s) ->
     if List.mem i env then error loc ("local var already bound: " ^ i);
     compile_expr e env 0 li @ ["PUSH"] @ compile_stmt s (i :: env) li @ ["POP"]
-  | Srefassign(loc,i,e) -> compile_expr e env 0 li @ ["PUSH"] @ compile_expr (Eident (loc,i)) env 1 li @ ["SETFIELD 0"] @ li
-  | Saassign(loc,i,e1,e2) ->
-    compile_expr e2 env 0 li @ ["PUSH"] @ compile_expr e1 env 1 li @ ["PUSH"] @ compile_expr (Eident (loc,i)) env 2 li @ ["SETVECTITEM"] @ li
+  | Srefassign(loc,(typ,i),e) -> compile_expr e env 0 li @ ["PUSH"] @ compile_expr (Eident (loc,typ,(typ,i))) env 1 li @ ["SETFIELD 0"] @ li
+  | Saassign(loc,(typ,i),e1,e2) ->
+    compile_expr e2 env 0 li @ ["PUSH"] @ compile_expr e1 env 1 li @ ["PUSH"] @ compile_expr (Eident (loc,typ,(typ,i))) env 2 li @ ["SETVECTITEM"] @ li
   | Sblock b -> compile_block ~label:label b env li
   | Sif (_,e,s1,s2) ->
     let sct = string_of_int (counter ()) in

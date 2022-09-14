@@ -37,9 +37,9 @@ prog : s=stmt EOF { s };
 
 stmt :
      | BEGIN b=block END { Ast.Sblock b }
-     | LET i=IDENT EQUAL e=expr IN s=stmt { Ast.Sassign(($startpos,$endpos), i, e, s) }
-     | i=IDENT REF_EQUAL e=expr { Ast.Srefassign(($startpos,$endpos), i, e) }
-     | i=IDENT LSQ e1=expr RSQ REF_EQUAL e2=expr { Ast.Saassign(($startpos,$endpos), i, e1, e2) }
+     | LET i=IDENT EQUAL e=expr IN s=stmt { Ast.Sassign(($startpos,$endpos), (Ast.Tunknown, i), e, s) }
+     | i=IDENT REF_EQUAL e=expr { Ast.Srefassign(($startpos,$endpos), (Ast.Tunknown, i), e) }
+     | i=IDENT LSQ e1=expr RSQ REF_EQUAL e2=expr { Ast.Saassign(($startpos,$endpos), (Ast.Tunknown, i), e1, e2) }
      | IF e=expr THEN s1=stmt ELSE s2=stmt { Ast.Sif (($startpos,$endpos), e, s1, s2) }
      | WHILE e=expr DO b=block DONE { Ast.Swhile (($startpos,$endpos), e, b) }
      | FOR s1=stmt SEMICOLON e=expr SEMICOLON s2=stmt DO b=block DONE { Ast.Sfor (($startpos,$endpos), s1, e, s2, b) }
@@ -56,7 +56,7 @@ block :
 
 expr :
      | c=CST { Ast.Ecst (($startpos,$endpos), Ast.Tunknown, c) }
-     | i=IDENT { Ast.Eident (($startpos,$endpos), i) }
+     | i=IDENT { Ast.Eident (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
      | LP NOT e=expr RP { Ast.Eunop (($startpos,$endpos), Unot, e) }
      | LP e1=expr PLUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Badd, e1, e2) }
      | LP e1=expr MINUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bsub, e1, e2) }
@@ -71,10 +71,10 @@ expr :
      | LP e1=expr AND e2=expr RP { Ast.Ebinop (($startpos,$endpos), Band, e1, e2) }
      | LP e1=expr OR e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bor, e1, e2) }
      | LP REF e=expr RP { Ast.Eref (($startpos,$endpos), e) }
-     | LP EXCL i=IDENT RP { Ast.Ederef (($startpos,$endpos), i) }
+     | LP EXCL i=IDENT RP { Ast.Ederef (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
      | LCU l=expr_list RCU { Ast.Earray (($startpos,$endpos), l) }
-     | i=IDENT LSQ e=expr RSQ { Ast.Eaget (($startpos,$endpos), i, e) }
-     | LP ARRAY_SIZE i=IDENT RP { Ast.Easize (($startpos,$endpos), i) }
+     | i=IDENT LSQ e=expr RSQ { Ast.Eaget (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i), e) }
+     | LP ARRAY_SIZE i=IDENT RP { Ast.Easize (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
      ;
 
 expr_list :

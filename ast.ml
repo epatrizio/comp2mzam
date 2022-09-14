@@ -2,8 +2,6 @@
 
 type loc = Lexing.position * Lexing.position
 
-type ident = string
-
 type typ =
   | Tunit
   | Tbool
@@ -11,6 +9,8 @@ type typ =
   | Tabool
   | Taint
   | Tunknown
+
+type ident = typ * string
 
 type unop =
   | Unot (* not e *)
@@ -27,14 +27,14 @@ type constant =
 
 type expr =
   | Ecst of loc * typ * constant
-  | Eident of loc * ident
+  | Eident of loc * typ * ident
   | Eref of loc * expr
-  | Ederef of loc * ident
+  | Ederef of loc * typ * ident
   | Eunop of loc * unop * expr
   | Ebinop of loc * binop * expr * expr
   | Earray of loc * expr list
-  | Eaget of loc * ident * expr
-  | Easize of loc * ident
+  | Eaget of loc * typ * ident * expr
+  | Easize of loc * typ * ident
 
 type stmt =
   | Sassign of loc * ident * expr * stmt
