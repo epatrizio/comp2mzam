@@ -41,8 +41,8 @@ let rec compile_expr ?(label = "") e env k li =
   | Ebinop (_,Bor,e1,e2) -> compile_binop_expr e1 e2 "or" env k li @ li
   | Eref (_,e) -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
   | Ederef (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["GETFIELD 0"] @ li
-  | Earray (loc,[]) -> error loc "empty array"
-  | Earray (loc,l) -> compile_array_expr (List.rev l) env k li loc @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
+  | Earray (loc,_,[]) -> error loc "empty array"
+  | Earray (loc,_,l) -> compile_array_expr (List.rev l) env k li loc @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
   | Eaget (loc,_,(typ,i),e) ->
     let tmp = "_tmp_" ^ string_of_int (counter ()) in
       compile_stmt (Sassign (loc, (typ,tmp), e, Sif (loc, Ebinop (loc, Bge, (Eident (loc,typ,(typ,tmp))), (Easize (loc,Tint,(typ,i)))), Sexit, Sskip))) env li @ 

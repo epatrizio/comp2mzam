@@ -15,6 +15,7 @@ let type_expr_deco e typ =
   | Ecst (loc,_,c) -> Ecst (loc,typ,c)
   | Eident (loc,_,(_,i)) -> Eident (loc,typ,(typ,i))
   | Ederef (loc,_,(_,i)) -> Ederef (loc,typ,(typ,i))
+  | Earray (loc,_,el) -> Earray (loc,typ,el)
   | Eaget (loc,_,i,e) -> Eaget (loc,typ,i,e)
   | Easize (loc,_,i) -> Easize (loc,typ,i)
   | exp -> exp
@@ -110,8 +111,8 @@ let rec type_expr env e =
       if ty1 == Tint && ty2 == Tint then Tbool else error loc "not integer type (>= comparaison binop)"
   | Eref (_,e) -> type_expr env e
   | Ederef (loc,_,(typ,i)) -> typ
-  | Earray (loc,[]) -> error loc "empty array"
-  | Earray (loc,l) -> let (ty,b) = elts_same_types l in
+  | Earray (loc,_,[]) -> error loc "empty array"
+  | Earray (loc,_,l) -> let (ty,b) = elts_same_types l in
       begin match b with
       | true -> begin match ty with
         | Tint -> Taint
@@ -121,20 +122,29 @@ let rec type_expr env e =
         end
       | false -> error loc "not identic type (array create)"
       end
-  | Eaget (loc,_,(typ,_),e) ->
-      begin match type_expr env e with
-      | Tint -> begin match typ with
-        | Taint -> Tint
-        | Tabool -> Tbool
-        | _ -> error loc "incoherent array type (array accessor)"
-        end
-      | _ -> error loc "not integer type (array accessor)"
-      end
-  | Easize (loc,typ,_) -> begin match typ with
-      | Taint -> Tint
-      | Tabool -> Tint
-      | _ -> error loc "not array type (array_size primitive)"
-      end
+  | Eaget (loc,_,(_,i),e) -> begin
+      try
+        let typ = Tmap.find i env in
+          begin match type_expr env e with
+          | Tint -> begin match typ with
+            | Taint -> Tint
+            | Tabool -> Tbool
+            | _ -> error loc "incoherent array type (array accessor)"
+            end
+          | _ -> error loc "not integer type (array accessor)"
+          end
+      with Not_found -> error loc ("unbound local var: " ^ i)
+    end
+  | Easize (loc,_,(_,i)) -> begin
+      try
+        let typ = Tmap.find i env in
+          begin match typ with
+          | Taint -> Tint
+          | Tabool -> Tint
+          | _ -> error loc "not array type (array_size primitive)"
+          end
+      with Not_found -> error loc ("unbound local var: " ^ i)
+    end
 
 and type_stmt env s =
   begin match s with
@@ -142,25 +152,33 @@ and type_stmt env s =
       let typ = type_expr env e in
       let env = Tmap.add i typ env in
         Sassign(loc,(typ,i),type_expr_deco e typ,type_stmt env s)
-  | Srefassign(loc,(typ,i),e) -> 
-      let tye = type_expr env e in
-        if typ == tye then Srefassign(loc,(typ,i),type_expr_deco e tye)
-        else error loc "not identic type (ref assign)"
-  | Saassign(loc,(typ,i),e1,e2) ->
-      let ty1 = type_expr env e1 in
-      let ty2 = type_expr env e2 in
-        begin match ty1 with
-          | Tint -> begin match ty2 with
-            | Tint ->
-                if typ == Taint then Saassign(loc,(typ,i),type_expr_deco e1 ty1,type_expr_deco e2 ty2)
-                else error loc "not integer type (array element assign)"
-            | Tbool ->
-                if typ == Tabool then Saassign(loc,(typ,i),type_expr_deco e1 ty1,type_expr_deco e2 ty2)
-                else error loc "not boolean type (array element assign)"
-            | _ -> error loc "incoherent type (array element assign)"
-            end
-          | _ -> error loc "not integer type (array assign accessor)"
+  | Srefassign(loc,(_,i),e) -> begin
+      try
+        let typ = Tmap.find i env in
+        let tye = type_expr env e in
+          if typ == tye then Srefassign(loc,(typ,i),type_expr_deco e tye)
+          else error loc "not identic type (ref assign)"
+      with Not_found -> error loc ("unbound local var: " ^ i)
+    end
+  | Saassign(loc,(_,i),e1,e2) -> begin
+      try
+        let typ = Tmap.find i env in
+        let ty1 = type_expr env e1 in
+        let ty2 = type_expr env e2 in
+          begin match ty1 with
+            | Tint -> begin match ty2 with
+              | Tint ->
+                  if typ == Taint then Saassign(loc,(typ,i),type_expr_deco e1 ty1,type_expr_deco e2 ty2)
+                  else error loc "not integer type (array element assign)"
+              | Tbool ->
+                  if typ == Tabool then Saassign(loc,(typ,i),type_expr_deco e1 ty1,type_expr_deco e2 ty2)
+                  else error loc "not boolean type (array element assign)"
+              | _ -> error loc "incoherent type (array element assign)"
+              end
+            | _ -> error loc "not integer type (array assign accessor)"
           end
+      with Not_found -> error loc ("unbound local var: " ^ i)
+    end
   | Sblock b -> Sblock (type_block env b)
   | Swhile (loc,e,b) ->
       let typ = type_expr env e in

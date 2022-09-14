@@ -32,7 +32,7 @@ type expr =
   | Ederef of loc * typ * ident
   | Eunop of loc * unop * expr
   | Ebinop of loc * binop * expr * expr
-  | Earray of loc * expr list
+  | Earray of loc * typ * expr list
   | Eaget of loc * typ * ident * expr
   | Easize of loc * typ * ident
 
