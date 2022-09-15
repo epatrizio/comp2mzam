@@ -12,15 +12,15 @@ type environment = typ Tmap.t
 
 let type_expr_deco e typ =
   match e with
-  | Ecst (loc,_,c) -> print_string " ecst "; Ecst (loc,typ,c)
-  | Eident (loc,_,(_,i)) -> print_string " eident "; Eident (loc,typ,(typ,i))
-  | Eref (loc,_,e) -> print_string " eref "; Eref (loc,typ,e)
-  | Ederef (loc,_,(_,i)) -> print_string " edref "; Ederef (loc,typ,(typ,i))
-  | Eunop (loc,_,u,e) -> print_string " eunop "; Eunop (loc,typ,u,e)
-  | Ebinop (loc,_,b,e1,e2) -> print_string " ebinop "; Ebinop (loc,typ,b,e1,e2)
-  | Earray (loc,_,el) -> print_string " earray "; Earray (loc,typ,el)
-  | Eaget (loc,_,i,e) -> print_string " eaget "; Eaget (loc,typ,i,e)
-  | Easize (loc,_,i) -> print_string " easize "; Easize (loc,typ,i)
+  | Ecst (loc,_,c) -> Ecst (loc,typ,c)
+  | Eident (loc,_,(_,i)) -> Eident (loc,typ,(typ,i))
+  | Eref (loc,_,e) -> Eref (loc,typ,e)
+  | Ederef (loc,_,(_,i)) -> Ederef (loc,typ,(typ,i))
+  | Eunop (loc,_,u,e) -> Eunop (loc,typ,u,e)
+  | Ebinop (loc,_,b,e1,e2) -> Ebinop (loc,typ,b,e1,e2)
+  | Earray (loc,_,el) -> Earray (loc,typ,el)
+  | Eaget (loc,_,i,e) -> Eaget (loc,typ,i,e)
+  | Easize (loc,_,i) -> Easize (loc,typ,i)
 
 let rec type_expr env e =
   let elts_same_types = function
@@ -112,7 +112,9 @@ let rec type_expr env e =
     let ty2 = type_expr env e2 in
       if ty1 == Tint && ty2 == Tint then Tbool else error loc "not integer type (>= comparaison binop)"
   | Eref (_,_,e) -> type_expr env e
-  | Ederef (loc,_,(typ,i)) -> typ
+  | Ederef (loc,_,(_,i)) -> begin
+      try Tmap.find i env with Not_found -> error loc ("unbound local var: " ^ i)
+    end
   | Earray (loc,_,[]) -> error loc "empty array"
   | Earray (loc,_,l) -> let (ty,b) = elts_same_types l in
       begin match b with
