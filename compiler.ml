@@ -44,7 +44,6 @@ let rec compile_expr ?(label = "") e env k li =
   | Earray (loc,_,[]) -> error loc "empty array"
   | Earray (loc,_,l) -> compile_array_expr (List.rev l) env k li loc @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
   | Eaget (loc,_,(typ,i),e) ->
-    print_string " eaget compile ";
     let tmp = "_tmp_" ^ string_of_int (counter ()) in
       compile_stmt (Sassign (loc, (typ,tmp), e, Sif (loc, Ebinop (loc, Tunknown, Bge, (Eident (loc,typ,(typ,tmp))), (Easize (loc,Tint,(typ,i)))), Sexit, Sskip))) env li @ 
         compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident (loc,typ,(typ,i))) env (k+1) li @  ["GETVECTITEM"] @ li
