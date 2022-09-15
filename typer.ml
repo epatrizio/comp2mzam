@@ -12,15 +12,15 @@ type environment = typ Tmap.t
 
 let type_expr_deco e typ =
   match e with
-  | Ecst (loc,_,c) -> Ecst (loc,typ,c)
-  | Eident (loc,_,(_,i)) -> Eident (loc,typ,(typ,i))
-  | Eref (loc,_,e) -> Eref (loc,typ,e)
-  | Ederef (loc,_,(_,i)) -> Ederef (loc,typ,(typ,i))
-  | Eunop (loc,_,u,e) -> Eunop (loc,typ,u,e)
-  | Earray (loc,_,el) -> Earray (loc,typ,el)
-  | Eaget (loc,_,i,e) -> Eaget (loc,typ,i,e)
-  | Easize (loc,_,i) -> Easize (loc,typ,i)
-  | exp -> exp
+  | Ecst (loc,_,c) -> print_string " ecst "; Ecst (loc,typ,c)
+  | Eident (loc,_,(_,i)) -> print_string " eident "; Eident (loc,typ,(typ,i))
+  | Eref (loc,_,e) -> print_string " eref "; Eref (loc,typ,e)
+  | Ederef (loc,_,(_,i)) -> print_string " edref "; Ederef (loc,typ,(typ,i))
+  | Eunop (loc,_,u,e) -> print_string " eunop "; Eunop (loc,typ,u,e)
+  | Ebinop (loc,_,b,e1,e2) -> print_string " ebinop "; Ebinop (loc,typ,b,e1,e2)
+  | Earray (loc,_,el) -> print_string " earray "; Earray (loc,typ,el)
+  | Eaget (loc,_,i,e) -> print_string " eaget "; Eaget (loc,typ,i,e)
+  | Easize (loc,_,i) -> print_string " easize "; Easize (loc,typ,i)
 
 let rec type_expr env e =
   let elts_same_types = function
@@ -39,7 +39,7 @@ let rec type_expr env e =
   | Eunop (_,_,Unot,(Ecst (_,_,(Cbool _)))) -> Tbool
   | Eunop (loc,_,Unot,(Ecst _)) -> error loc "not boolean type (unop)"
   | Eunop (_,_,Unot,e) -> type_expr env e
-  | Ebinop (loc,Band,e1,e2) -> begin match type_expr env e1 with
+  | Ebinop (loc,_,Band,e1,e2) -> begin match type_expr env e1 with
       | Tbool ->
           begin match type_expr env e2 with
           | Tbool -> Tbool
@@ -47,7 +47,7 @@ let rec type_expr env e =
           end
       | _ -> error loc "not boolean type (and binop)"
       end
-  | Ebinop (loc,Bor,e1,e2) -> begin match type_expr env e1 with
+  | Ebinop (loc,_,Bor,e1,e2) -> begin match type_expr env e1 with
       | Tbool ->
           begin match type_expr env e2 with
           | Tbool -> Tbool
@@ -55,7 +55,7 @@ let rec type_expr env e =
           end
       | _ -> error loc "not boolean type (or binop)"
       end
-  | Ebinop (loc,Badd,e1,e2) -> begin match type_expr env e1 with
+  | Ebinop (loc,_,Badd,e1,e2) -> begin match type_expr env e1 with
       | Tint ->
           begin match type_expr env e2 with
           | Tint -> Tint
@@ -63,7 +63,7 @@ let rec type_expr env e =
           end
       | _ -> error loc "not integer type (add binop)"
       end
-  | Ebinop (loc,Bsub,e1,e2) -> begin match type_expr env e1 with
+  | Ebinop (loc,_,Bsub,e1,e2) -> begin match type_expr env e1 with
       | Tint ->
           begin match type_expr env e2 with
           | Tint -> Tint
@@ -71,7 +71,7 @@ let rec type_expr env e =
           end
       | _ -> error loc "not integer type (sub binop)"
       end
-  | Ebinop (loc,Bmul,e1,e2) -> begin match type_expr env e1 with
+  | Ebinop (loc,_,Bmul,e1,e2) -> begin match type_expr env e1 with
       | Tint ->
           begin match type_expr env e2 with
           | Tint -> Tint
@@ -79,7 +79,7 @@ let rec type_expr env e =
           end
       | _ -> error loc "not integer type (mul binop)"
       end
-  | Ebinop (loc,Bdiv,e1,e2) -> begin match type_expr env e1 with
+  | Ebinop (loc,_,Bdiv,e1,e2) -> begin match type_expr env e1 with
       | Tint ->
           begin match type_expr env e2 with
           | Tint -> Tint
@@ -87,27 +87,27 @@ let rec type_expr env e =
           end
       | _ -> error loc "not integer type (div binop)"
       end
-  | Ebinop (loc,Beq,e1,e2) ->
+  | Ebinop (loc,_,Beq,e1,e2) ->
       let ty1 = type_expr env e1 in
       let ty2 = type_expr env e2 in
         if ty1 == ty2 then Tbool else error loc "not identic type (equals comparaison binop)"
-  | Ebinop (loc,Bneq,e1,e2) ->
+  | Ebinop (loc,_,Bneq,e1,e2) ->
     let ty1 = type_expr env e1 in
     let ty2 = type_expr env e2 in
       if ty1 == ty2 then Tbool else error loc "not identic type (diff comparaison binop)"
-  | Ebinop (loc,Blt,e1,e2) ->
+  | Ebinop (loc,_,Blt,e1,e2) ->
       let ty1 = type_expr env e1 in
       let ty2 = type_expr env e2 in
         if ty1 == Tint && ty2 == Tint then Tbool else error loc "not integer type (< comparaison binop)"
-  | Ebinop (loc,Ble,e1,e2) ->
+  | Ebinop (loc,_,Ble,e1,e2) ->
     let ty1 = type_expr env e1 in
     let ty2 = type_expr env e2 in
       if ty1 == Tint && ty2 == Tint then Tbool else error loc "not integer type (<= comparaison binop)"
-  | Ebinop (loc,Bgt,e1,e2) ->
+  | Ebinop (loc,_,Bgt,e1,e2) ->
     let ty1 = type_expr env e1 in
     let ty2 = type_expr env e2 in
       if ty1 == Tint && ty2 == Tint then Tbool else error loc "not integer type (> comparaison binop)"
-  | Ebinop (loc,Bge,e1,e2) ->
+  | Ebinop (loc,_,Bge,e1,e2) ->
     let ty1 = type_expr env e1 in
     let ty2 = type_expr env e2 in
       if ty1 == Tint && ty2 == Tint then Tbool else error loc "not integer type (>= comparaison binop)"

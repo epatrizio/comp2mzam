@@ -26,26 +26,27 @@ let rec compile_expr ?(label = "") e env k li =
     if not (List.mem i env) then error loc ("unbound local var: " ^ i);
     ["ACC " ^ string_of_int ((pos_list env i) + k)] @ li
   | Eunop (_,_,Unot,e) -> compile_expr e env k li @ ["PRIM not"] @ li
-  | Ebinop (_,Badd,e1,e2) -> compile_binop_expr e1 e2 "+" env k li @ li
-  | Ebinop (_,Bsub,e1,e2) -> compile_binop_expr e1 e2 "-" env k li @ li
-  | Ebinop (_,Bmul,e1,e2) -> compile_binop_expr e1 e2 "*" env k li @ li
-  | Ebinop (loc,Bdiv,e1,Ecst (_,_,Cint 0)) -> error loc "division by zero"
-  | Ebinop (_,Bdiv,e1,e2) -> compile_binop_expr e1 e2 "/" env k li @ li
-  | Ebinop (_,Beq,e1,e2) -> compile_binop_expr e1 e2 "=" env k li @ li
-  | Ebinop (_,Bneq,e1,e2) -> compile_binop_expr e1 e2 "<>" env k li @ li
-  | Ebinop (_,Blt,e1,e2) -> compile_binop_expr e1 e2 "<" env k li @ li
-  | Ebinop (_,Ble,e1,e2) -> compile_binop_expr e1 e2 "<=" env k li @ li
-  | Ebinop (_,Bgt,e1,e2) -> compile_binop_expr e1 e2 ">" env k li @ li
-  | Ebinop (_,Bge,e1,e2) -> compile_binop_expr e1 e2 ">=" env k li @ li
-  | Ebinop (_,Band,e1,e2) -> compile_binop_expr e1 e2 "&" env k li @ li
-  | Ebinop (_,Bor,e1,e2) -> compile_binop_expr e1 e2 "or" env k li @ li
+  | Ebinop (_,_,Badd,e1,e2) -> compile_binop_expr e1 e2 "+" env k li @ li
+  | Ebinop (_,_,Bsub,e1,e2) -> compile_binop_expr e1 e2 "-" env k li @ li
+  | Ebinop (_,_,Bmul,e1,e2) -> compile_binop_expr e1 e2 "*" env k li @ li
+  | Ebinop (loc,_,Bdiv,e1,Ecst (_,_,Cint 0)) -> error loc "division by zero"
+  | Ebinop (_,_,Bdiv,e1,e2) -> compile_binop_expr e1 e2 "/" env k li @ li
+  | Ebinop (_,_,Beq,e1,e2) -> compile_binop_expr e1 e2 "=" env k li @ li
+  | Ebinop (_,_,Bneq,e1,e2) -> compile_binop_expr e1 e2 "<>" env k li @ li
+  | Ebinop (_,_,Blt,e1,e2) -> compile_binop_expr e1 e2 "<" env k li @ li
+  | Ebinop (_,_,Ble,e1,e2) -> compile_binop_expr e1 e2 "<=" env k li @ li
+  | Ebinop (_,_,Bgt,e1,e2) -> compile_binop_expr e1 e2 ">" env k li @ li
+  | Ebinop (_,_,Bge,e1,e2) -> compile_binop_expr e1 e2 ">=" env k li @ li
+  | Ebinop (_,_,Band,e1,e2) -> compile_binop_expr e1 e2 "&" env k li @ li
+  | Ebinop (_,_,Bor,e1,e2) -> compile_binop_expr e1 e2 "or" env k li @ li
   | Eref (_,_,e) -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
   | Ederef (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["GETFIELD 0"] @ li
   | Earray (loc,_,[]) -> error loc "empty array"
   | Earray (loc,_,l) -> compile_array_expr (List.rev l) env k li loc @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
   | Eaget (loc,_,(typ,i),e) ->
+    print_string " eaget compile ";
     let tmp = "_tmp_" ^ string_of_int (counter ()) in
-      compile_stmt (Sassign (loc, (typ,tmp), e, Sif (loc, Ebinop (loc, Bge, (Eident (loc,typ,(typ,tmp))), (Easize (loc,Tint,(typ,i)))), Sexit, Sskip))) env li @ 
+      compile_stmt (Sassign (loc, (typ,tmp), e, Sif (loc, Ebinop (loc, Tunknown, Bge, (Eident (loc,typ,(typ,tmp))), (Easize (loc,Tint,(typ,i)))), Sexit, Sskip))) env li @ 
         compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident (loc,typ,(typ,i))) env (k+1) li @  ["GETVECTITEM"] @ li
   | Easize (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["VECTLENGTH"] @ li
 

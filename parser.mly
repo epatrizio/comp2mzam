@@ -58,18 +58,18 @@ expr :
      | c=CST { Ast.Ecst (($startpos,$endpos), Ast.Tunknown, c) }
      | i=IDENT { Ast.Eident (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
      | LP NOT e=expr RP { Ast.Eunop (($startpos,$endpos), Ast.Tunknown, Unot, e) }
-     | LP e1=expr PLUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Badd, e1, e2) }
-     | LP e1=expr MINUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bsub, e1, e2) }
-     | LP e1=expr MULT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bmul, e1, e2) }
-     | LP e1=expr DIV e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bdiv, e1, e2) }
-     | LP e1=expr CMP_EQ e2=expr RP { Ast.Ebinop (($startpos,$endpos), Beq, e1, e2) }
-     | LP e1=expr CMP_NEQ e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bneq, e1, e2) }
-     | LP e1=expr CMP_LT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Blt, e1, e2) }
-     | LP e1=expr CMP_LE e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ble, e1, e2) }
-     | LP e1=expr CMP_GT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bgt, e1, e2) }
-     | LP e1=expr CMP_GE e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bge, e1, e2) }
-     | LP e1=expr AND e2=expr RP { Ast.Ebinop (($startpos,$endpos), Band, e1, e2) }
-     | LP e1=expr OR e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bor, e1, e2) }
+     | LP e1=expr PLUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Badd, e1, e2) }
+     | LP e1=expr MINUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Bsub, e1, e2) }
+     | LP e1=expr MULT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Bmul, e1, e2) }
+     | LP e1=expr DIV e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Bdiv, e1, e2) }
+     | LP e1=expr CMP_EQ e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Beq, e1, e2) }
+     | LP e1=expr CMP_NEQ e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Bneq, e1, e2) }
+     | LP e1=expr CMP_LT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Blt, e1, e2) }
+     | LP e1=expr CMP_LE e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Ble, e1, e2) }
+     | LP e1=expr CMP_GT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Bgt, e1, e2) }
+     | LP e1=expr CMP_GE e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Bge, e1, e2) }
+     | LP e1=expr AND e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Band, e1, e2) }
+     | LP e1=expr OR e2=expr RP { Ast.Ebinop (($startpos,$endpos), Ast.Tunknown, Bor, e1, e2) }
      | LP REF e=expr RP { Ast.Eref (($startpos,$endpos), Ast.Tunknown, e) }
      | LP EXCL i=IDENT RP { Ast.Ederef (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
      | LCU l=expr_list RCU { Ast.Earray (($startpos,$endpos), Ast.Tunknown, l) }
