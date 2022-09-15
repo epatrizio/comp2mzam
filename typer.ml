@@ -16,6 +16,7 @@ let type_expr_deco e typ =
   | Eident (loc,_,(_,i)) -> Eident (loc,typ,(typ,i))
   | Eref (loc,_,e) -> Eref (loc,typ,e)
   | Ederef (loc,_,(_,i)) -> Ederef (loc,typ,(typ,i))
+  | Eunop (loc,_,u,e) -> Eunop (loc,typ,u,e)
   | Earray (loc,_,el) -> Earray (loc,typ,el)
   | Eaget (loc,_,i,e) -> Eaget (loc,typ,i,e)
   | Easize (loc,_,i) -> Easize (loc,typ,i)
@@ -35,9 +36,9 @@ let rec type_expr env e =
   | Eident (loc,_,(_,i)) -> begin
       try Tmap.find i env with Not_found -> error loc ("unbound local var: " ^ i)
     end
-  | Eunop (_,Unot,(Ecst (_,_,(Cbool _)))) -> Tbool
-  | Eunop (loc,Unot,(Ecst _)) -> error loc "not boolean type (unop)"
-  | Eunop (_,Unot,e) -> type_expr env e
+  | Eunop (_,_,Unot,(Ecst (_,_,(Cbool _)))) -> Tbool
+  | Eunop (loc,_,Unot,(Ecst _)) -> error loc "not boolean type (unop)"
+  | Eunop (_,_,Unot,e) -> type_expr env e
   | Ebinop (loc,Band,e1,e2) -> begin match type_expr env e1 with
       | Tbool ->
           begin match type_expr env e2 with

@@ -57,7 +57,7 @@ block :
 expr :
      | c=CST { Ast.Ecst (($startpos,$endpos), Ast.Tunknown, c) }
      | i=IDENT { Ast.Eident (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
-     | LP NOT e=expr RP { Ast.Eunop (($startpos,$endpos), Unot, e) }
+     | LP NOT e=expr RP { Ast.Eunop (($startpos,$endpos), Ast.Tunknown, Unot, e) }
      | LP e1=expr PLUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Badd, e1, e2) }
      | LP e1=expr MINUS e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bsub, e1, e2) }
      | LP e1=expr MULT e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bmul, e1, e2) }
