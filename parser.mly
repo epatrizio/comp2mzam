@@ -78,6 +78,7 @@ expr :
      ;
 
 expr_list :
+     | { [] }
      | e=expr { [e] }
      | e=expr COMMA l=expr_list { e :: l }
      ;
