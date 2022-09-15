@@ -29,7 +29,6 @@ let rec compile_expr ?(label = "") e env k li =
   | Ebinop (_,_,Badd,e1,e2) -> compile_binop_expr e1 e2 "+" env k li @ li
   | Ebinop (_,_,Bsub,e1,e2) -> compile_binop_expr e1 e2 "-" env k li @ li
   | Ebinop (_,_,Bmul,e1,e2) -> compile_binop_expr e1 e2 "*" env k li @ li
-  | Ebinop (loc,_,Bdiv,e1,Ecst (_,_,Cint 0)) -> error loc "division by zero"
   | Ebinop (_,_,Bdiv,e1,e2) -> compile_binop_expr e1 e2 "/" env k li @ li
   | Ebinop (_,_,Beq,e1,e2) -> compile_binop_expr e1 e2 "=" env k li @ li
   | Ebinop (_,_,Bneq,e1,e2) -> compile_binop_expr e1 e2 "<>" env k li @ li

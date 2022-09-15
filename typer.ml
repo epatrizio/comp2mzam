@@ -79,6 +79,7 @@ let rec type_expr env e =
           end
       | _ -> error loc "not integer type (mul binop)"
       end
+  | Ebinop (loc,_,Bdiv,_,Ecst (_,_,Cint 0)) -> error loc "division by zero"
   | Ebinop (loc,_,Bdiv,e1,e2) -> begin match type_expr env e1 with
       | Tint ->
           begin match type_expr env e2 with
