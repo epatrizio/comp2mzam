@@ -70,7 +70,7 @@ expr :
      | LP e1=expr CMP_GE e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bge, e1, e2) }
      | LP e1=expr AND e2=expr RP { Ast.Ebinop (($startpos,$endpos), Band, e1, e2) }
      | LP e1=expr OR e2=expr RP { Ast.Ebinop (($startpos,$endpos), Bor, e1, e2) }
-     | LP REF e=expr RP { Ast.Eref (($startpos,$endpos), e) }
+     | LP REF e=expr RP { Ast.Eref (($startpos,$endpos), Ast.Tunknown, e) }
      | LP EXCL i=IDENT RP { Ast.Ederef (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
      | LCU l=expr_list RCU { Ast.Earray (($startpos,$endpos), Ast.Tunknown, l) }
      | i=IDENT LSQ e=expr RSQ { Ast.Eaget (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i), e) }

@@ -39,7 +39,7 @@ let rec compile_expr ?(label = "") e env k li =
   | Ebinop (_,Bge,e1,e2) -> compile_binop_expr e1 e2 ">=" env k li @ li
   | Ebinop (_,Band,e1,e2) -> compile_binop_expr e1 e2 "&" env k li @ li
   | Ebinop (_,Bor,e1,e2) -> compile_binop_expr e1 e2 "or" env k li @ li
-  | Eref (_,e) -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
+  | Eref (_,_,e) -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
   | Ederef (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["GETFIELD 0"] @ li
   | Earray (loc,_,[]) -> error loc "empty array"
   | Earray (loc,_,l) -> compile_array_expr (List.rev l) env k li loc @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li

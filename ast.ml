@@ -28,7 +28,7 @@ type constant =
 type expr =
   | Ecst of loc * typ * constant
   | Eident of loc * typ * ident
-  | Eref of loc * expr
+  | Eref of loc * typ * expr
   | Ederef of loc * typ * ident
   | Eunop of loc * unop * expr
   | Ebinop of loc * binop * expr * expr

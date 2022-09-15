@@ -14,6 +14,7 @@ let type_expr_deco e typ =
   match e with
   | Ecst (loc,_,c) -> Ecst (loc,typ,c)
   | Eident (loc,_,(_,i)) -> Eident (loc,typ,(typ,i))
+  | Eref (loc,_,e) -> Eref (loc,typ,e)
   | Ederef (loc,_,(_,i)) -> Ederef (loc,typ,(typ,i))
   | Earray (loc,_,el) -> Earray (loc,typ,el)
   | Eaget (loc,_,i,e) -> Eaget (loc,typ,i,e)
@@ -109,7 +110,7 @@ let rec type_expr env e =
     let ty1 = type_expr env e1 in
     let ty2 = type_expr env e2 in
       if ty1 == Tint && ty2 == Tint then Tbool else error loc "not integer type (>= comparaison binop)"
-  | Eref (_,e) -> type_expr env e
+  | Eref (_,_,e) -> type_expr env e
   | Ederef (loc,_,(typ,i)) -> typ
   | Earray (loc,_,[]) -> error loc "empty array"
   | Earray (loc,_,l) -> let (ty,b) = elts_same_types l in
