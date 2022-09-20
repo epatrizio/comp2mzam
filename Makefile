@@ -30,6 +30,9 @@ check_grammar:
 compile:
 	@./$(EXE) tests/$(S)
 
+compile_debug:
+	@./$(EXE) --debug tests/$(S)
+
 compile_no_typing:
 	@./$(EXE) --no-typing tests/$(S)
 
