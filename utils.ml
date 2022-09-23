@@ -54,8 +54,8 @@ let ast_printer ast_stmt =
     | Tunit -> eprintf "Type:unit "
     | Tbool -> eprintf "Type:bool "
     | Tint -> eprintf "Type:int "
-    | Tabool -> eprintf "Type:bool array "
-    | Taint -> eprintf "Type:int array "
+    | Tabool -> eprintf "Type:bool_array "
+    | Taint -> eprintf "Type:int_array "
     | Tunknown -> eprintf "Type:unknown "
   in
   let ident_printer (typ,i) =
