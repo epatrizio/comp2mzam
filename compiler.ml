@@ -41,10 +41,10 @@ let rec compile_expr ?(label = "") e env k li =
   | Eref (_,_,e) -> compile_expr e env k li @ ["MAKEBLOCK 1"] @ li
   | Ederef (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["GETFIELD 0"] @ li
   | Earray (loc,_,l) -> compile_array_expr (List.rev l) env k li loc @ ["MAKEBLOCK " ^ string_of_int (List.length l)] @ li
-  | Eaget (loc,_,(typ,i),e) ->
+  | Eaget (loc,ty1,(ty2,i),e) ->
     let tmp = "_tmp_" ^ string_of_int (counter ()) in
-      compile_stmt (Sassign (loc, (typ,tmp), e, Sif (loc, Ebinop (loc, Tunknown, Bge, (Eident (loc,typ,(typ,tmp))), (Easize (loc,Tint,(typ,i)))), Sexit, Sskip))) env li @ 
-        compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident (loc,typ,(typ,i))) env (k+1) li @  ["GETVECTITEM"] @ li
+      compile_stmt (Sassign (loc, (ty1,tmp), e, Sif (loc, Ebinop (loc, ty1, Bge, (Eident (loc,ty2,(ty2,tmp))), (Easize (loc,Tint,(ty2,i)))), Sexit, Sskip))) env li @ 
+        compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident (loc,ty2,(ty2,i))) env (k+1) li @  ["GETVECTITEM"] @ li
   | Easize (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["VECTLENGTH"] @ li
 
   and compile_stmt ?(label = "") s env li =
