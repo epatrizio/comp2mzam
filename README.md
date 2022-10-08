@@ -38,6 +38,10 @@ See more details with [Hindley–Milner type system](https://en.wikipedia.org/wi
 In conclusion, typing is a complex dimension of programming languages, very powerful.
 Fun fact, in functional programming, there is an expression that says, "type-directed programming"!
 
+Good news, to go further, here is a [Lambda calculus typer](https://github.com/epatrizio/lcalculustyp)
+from the "Typing and Static Analysis" course of my professional training at Sorbonne University (2022).\
+The implementation is more advanced, therefore allows to continue in the core concepts understanding.
+
 ## Compilation and execution
 
 To compile the project source code, run the default Makefile command
