@@ -6,9 +6,9 @@ GREEN=\033[0;32m
 NC=\033[0m # No Color
 
 all:
+	ocamlc -c ast.ml;
 	ocamlc -c utils.ml;
 	ocamllex lexer.mll;
-	ocamlc -c ast.ml;
 	ocamlc -c compiler.ml;
 	menhir parser.mly;
 	ocamlc -c parser.mli;
