@@ -1,0 +1,10 @@
+let x = (ref 44) in
+let y = (ref 2) in
+begin
+  print x;
+  print y;
+  x := ((!x) - (!y));
+  y := ((!y) + 8);
+  print x;
+  print y
+end

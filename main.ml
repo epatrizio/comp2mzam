@@ -2,6 +2,8 @@ open Format
 open Utils
 
 let no_typing = ref false
+let abs_inter_concrete = ref false
+
 let debug = ref false
 
 let in_file_name = ref ""
@@ -9,20 +11,28 @@ let set_file s = in_file_name := s
 
 let options = [
   "--no-typing", Arg.Set no_typing, " Compile without typing checks";
+  "--abs-inter-concrete", Arg.Set abs_inter_concrete, " Abstract interpretation - concrete domain";
   "--debug", Arg.Set debug, " Debug mode (ast printer)"
 ]
 
 let usage = "usage: ./c2mz [options] tests/bc_(test).txt"
 
-let process source_code_file no_typing debug =
+module ConcreteAnalysis =
+  Abstract_interpreter.Interprete(Domain_concrete.Concrete)
+
+let process source_code_file no_typing abs_inter_concrete debug =
     let ic = open_in source_code_file in
     let lexbuf = Lexing.from_channel ic in
   try
     let ast = Parser.prog Lexer.token lexbuf in
       close_in ic;
-      let ast = if not no_typing then Typer.typing ast else ast in
-        if debug then ast_printer ast;
-        Compiler.compile ast source_code_file
+      if abs_inter_concrete then
+        ConcreteAnalysis.analyse_prog (Typer.typing ast)
+      else (
+        let ast = if not no_typing then Typer.typing ast else ast in
+          if debug then ast_printer ast;
+          Compiler.compile ast source_code_file
+      )
   with
     | Lexer.Lexing_error c -> 
         localisation (Lexing.lexeme_start_p lexbuf) source_code_file;
@@ -52,4 +62,4 @@ let _ =
     Arg.usage options usage;
     exit 1
   end;
-  process !in_file_name !no_typing !debug
+  process !in_file_name !no_typing !abs_inter_concrete !debug

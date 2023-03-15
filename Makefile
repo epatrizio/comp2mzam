@@ -15,8 +15,11 @@ all:
 	ocamlc -c parser.ml;
 	ocamlc -c lexer.ml;
 	ocamlc -c typer.ml;
+	ocamlc -c domain.ml;
+	ocamlc -c domain_concrete.ml;
+	ocamlc -c abstract_interpreter.ml;
 	ocamlc -c main.ml;
-	ocamlc -o $(EXE) utils.cmo ast.cmo compiler.cmo lexer.cmo parser.cmo typer.cmo main.cmo
+	ocamlc -o $(EXE) utils.cmo ast.cmo compiler.cmo lexer.cmo parser.cmo typer.cmo domain.cmo domain_concrete.cmo abstract_interpreter.cmo main.cmo
 
 clean:
 	rm -rf *.cmo *.cmi lexer.ml parser.ml parser.mli $(EXE)
@@ -35,6 +38,9 @@ compile_debug:
 
 compile_no_typing:
 	@./$(EXE) --no-typing tests/$(S)
+
+abs_inter_concrete:
+	@./$(EXE) --abs-inter-concrete tests/$(S)
 
 vm:
 	@$(VM) tests/build/bc_$(S)

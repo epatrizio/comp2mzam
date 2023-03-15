@@ -1,0 +1,7 @@
+let x = (ref 0) in
+begin
+  while ((!x) < 10) do
+    print x;
+    x := ((!x) + 1)
+  done
+end
