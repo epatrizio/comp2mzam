@@ -46,7 +46,8 @@ let rec compile_expr ?(label = "") e env k li =
       compile_stmt (Sassign (loc, (ty1,tmp), e, Sif (loc, Ebinop (loc, ty1, Bge, (Eident (loc,ty2,(ty2,tmp))), (Easize (loc,Tint,(ty2,i)))), Sexit, Sskip))) env li @ 
         compile_expr e env k li @ ["PUSH"] @ compile_expr (Eident (loc,ty2,(ty2,i))) env (k+1) li @  ["GETVECTITEM"] @ li
   | Easize (loc,_,(typ,i)) -> compile_expr (Eident (loc,typ,(typ,i))) env k li @ ["VECTLENGTH"] @ li
-
+  | Erand (loc,typ,e1,e2) -> 
+      (compile_expr e2 env k li) @ ["PUSH"] @ (compile_expr e1 env (k+1) li) @ ["PRIM rand -- TODO"]
   and compile_stmt ?(label = "") s env li =
   match s with
   | Sassign(loc,(_,i),e,s) ->

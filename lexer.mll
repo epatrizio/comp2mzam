@@ -63,6 +63,7 @@ rule token = parse
   | "not"         { NOT }
   | "print"       { PRINT }
   | "print_all"   { PRINT_ALL }
+  | "rand"        { RAND }
   | "array_size"  { ARRAY_SIZE }
   | "exit"        { EXIT }
   | "skip"        { SKIP }

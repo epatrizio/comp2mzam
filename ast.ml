@@ -35,6 +35,7 @@ type expr =
   | Earray of loc * typ * expr list
   | Eaget of loc * typ * ident * expr
   | Easize of loc * typ * ident
+  | Erand of loc * typ * expr * expr
 
 type stmt =
   | Sassign of loc * ident * expr * stmt

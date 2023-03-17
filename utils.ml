@@ -102,6 +102,8 @@ let ast_printer ast_stmt =
     | Eaget (loc,typ,i,e) ->
         eprintf "Expr:array_get > "; loc_printer loc; type_printer typ; ident_printer i; expr_printer e
     | Easize (loc,typ,i) -> eprintf "Expr:array_size > "; loc_printer loc; type_printer typ; ident_printer i
+    | Erand (loc,typ,e1,e2) ->
+        eprintf "Expr:rand > "; loc_printer loc; type_printer typ; expr_printer e1; expr_printer e2
     end;
     eprintf "@]"
   and expr_list_printer l =

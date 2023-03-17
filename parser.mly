@@ -11,7 +11,7 @@
 
 %token <Ast.constant> CST
 %token LET IN REF BEGIN END IF THEN ELSE WHILE DO DONE FOR AND OR NOT
-%token PRINT PRINT_ALL ARRAY_SIZE EXIT SKIP
+%token PRINT PRINT_ALL RAND ARRAY_SIZE EXIT SKIP
 %token EOF
 %token COMMA SEMICOLON EXCL LP RP LSQ RSQ LCU RCU
 %token EQUAL REF_EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
@@ -76,6 +76,7 @@ expr :
      | LCU l=expr_list RCU { Ast.Earray (($startpos,$endpos), Ast.Tunknown, l) }
      | i=IDENT LSQ e=expr RSQ { Ast.Eaget (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i), e) }
      | LP ARRAY_SIZE i=IDENT RP { Ast.Easize (($startpos,$endpos), Ast.Tunknown, (Ast.Tunknown, i)) }
+     | LP RAND e1=expr e2=expr RP { Ast.Erand (($startpos,$endpos), Ast.Tunknown, e1, e2) }
      ;
 
 expr_list :

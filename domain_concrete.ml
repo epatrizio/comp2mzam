@@ -34,7 +34,7 @@ module Concrete = (struct
   let int_map (f : int -> int) (s : ValSet.t) : ValSet.t =
     ValSet.fold (fun x acc -> ValSet.add (f x) acc) s ValSet.empty
 
-  let int2_map (f: int -> int -> int) (s1:ValSet.t) (s2:ValSet.t) : ValSet.t =
+  let int2_map (f: int -> int -> int) (s1 : ValSet.t) (s2 : ValSet.t) : ValSet.t =
     ValSet.fold
       (fun x1 acc ->
         ValSet.fold
@@ -59,6 +59,12 @@ module Concrete = (struct
     | Ebinop (_, Tint, Bdiv, e1, e2) ->
         let v1 = eval_expr e1 m and v2 = eval_expr e2 m in
           let v2 = ValSet.remove 0 v2 in int2_map (fun x y -> x / y) v1 v2
+    | Erand (_, Tint, Ecst (_, Tint, Cint i1), Ecst (_, Tint, Cint i2)) ->
+        let rec rand_set v set =
+          if v > i2 then set
+          else rand_set (v+1) (ValSet.add v set)
+        in
+        rand_set i1 ValSet.empty
     | _ -> ValSet.empty
 
   let eval_compare (e1 : expr) (bop : binop) (e2 : expr) (m : env) : bool =
