@@ -45,6 +45,7 @@ type stmt =
   | Swhile of loc * expr * block
   | Sfor of loc * stmt * expr * stmt * block
   | Sprint of expr
+  | Sprintall of loc
   | Sexit
   | Sskip
 

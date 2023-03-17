@@ -244,6 +244,7 @@ and type_stmt env s =
         | _ -> error loc "not boolean type (if condition statement)"
         end
       end
+  | Sprintall loc -> Sprintall loc
   | Sexit -> Sexit
   | Sskip -> Sskip
   end

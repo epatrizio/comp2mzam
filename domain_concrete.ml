@@ -130,4 +130,18 @@ module Concrete = (struct
       ) m;
     eprintf "}@."
 
+  let print_all lnum m =
+    eprintf "line %d: " lnum;
+    eprintf "{ ";
+    EnvSet.iter
+      (fun env ->
+        eprintf "[";
+        Env.iter
+          (fun var v ->
+            eprintf "%s=%s;" var (Int.to_string v)
+          ) env;
+        eprintf "]; "
+      ) m;
+      eprintf "}@."
+
 end: DOMAIN)

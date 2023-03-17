@@ -42,5 +42,6 @@ module type DOMAIN =
     val is_bottom: t -> bool
 
     val print: int -> t -> string list -> unit
+    val print_all: int -> t -> unit
 
   end

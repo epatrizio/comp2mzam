@@ -11,7 +11,7 @@
 
 %token <Ast.constant> CST
 %token LET IN REF BEGIN END IF THEN ELSE WHILE DO DONE FOR AND OR NOT
-%token PRINT ARRAY_SIZE EXIT SKIP
+%token PRINT PRINT_ALL ARRAY_SIZE EXIT SKIP
 %token EOF
 %token COMMA SEMICOLON EXCL LP RP LSQ RSQ LCU RCU
 %token EQUAL REF_EQUAL CMP_EQ CMP_NEQ CMP_LT CMP_LE CMP_GT CMP_GE
@@ -44,6 +44,7 @@ stmt :
      | WHILE e=expr DO b=block DONE { Ast.Swhile (($startpos,$endpos), e, b) }
      | FOR s1=stmt SEMICOLON e=expr SEMICOLON s2=stmt DO b=block DONE { Ast.Sfor (($startpos,$endpos), s1, e, s2, b) }
      | PRINT e=expr { Ast.Sprint e }
+     | PRINT_ALL { Ast.Sprintall ($startpos,$endpos) }
      | EXIT { Ast.Sexit }
      | SKIP { Ast.Sskip }
      ;

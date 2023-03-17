@@ -121,6 +121,7 @@ let ast_printer ast_stmt =
     | Sfor (loc,s1,e,s2,b) ->
         eprintf "Stmt:for > "; loc_printer loc; stmt_printer s1; expr_printer e; stmt_printer s2; block_printer b
     | Sprint e -> eprintf "Stmt:print > "; expr_printer e
+    | Sprintall loc -> eprintf "Stmt:printall"; loc_printer loc
     | Sexit -> eprintf "Stmt:exit"
     | Sskip -> eprintf "Stmt:skip"
     end;
