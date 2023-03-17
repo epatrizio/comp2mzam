@@ -115,7 +115,8 @@ module Concrete = (struct
 
   let is_bottom m = EnvSet.is_empty m
 
-  let print m vars =
+  let print lnum m vars =
+    eprintf "line %d: " lnum;
     eprintf "{ ";
     EnvSet.iter
       (fun env ->
