@@ -23,10 +23,10 @@ module Interprete(D : DOMAIN) =
           (if r then D.join else D.meet) (expr_handle a e1 r) (expr_handle a e2 r)
       | Ebinop (_, _, Beq, e1, e2) -> D.compare a e1 (if r then Beq else Bneq) e2
       | Ebinop (_, _, Bneq, e1, e2) -> D.compare a e1 (if r then Bneq else Beq) e2
-      | Ebinop (_, _, Blt, e1, e2) -> D.compare a e1 (if r then Blt else Bgt) e2
-      | Ebinop (_, _, Bgt, e1, e2) -> D.compare a e1 (if r then Bgt else Blt) e2
-      | Ebinop (_, _, Ble, e1, e2) -> D.compare a e1 (if r then Ble else Bge) e2
-      | Ebinop (_, _, Bge, e1, e2) -> D.compare a e1 (if r then Bge else Ble) e2
+      | Ebinop (_, _, Blt, e1, e2) -> D.compare a e1 (if r then Blt else Bge) e2
+      | Ebinop (_, _, Bgt, e1, e2) -> D.compare a e1 (if r then Bgt else Ble) e2
+      | Ebinop (_, _, Ble, e1, e2) -> D.compare a e1 (if r then Ble else Bgt) e2
+      | Ebinop (_, _, Bge, e1, e2) -> D.compare a e1 (if r then Bge else Blt) e2
       | Ecst (_, Tbool, Cbool b) -> if b = r then a else D.bottom ()
       | _ -> D.bottom ()
     in
