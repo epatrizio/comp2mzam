@@ -1,2 +1,2 @@
 let r = (rand 3 9) in
-  print r
+  print_ai r

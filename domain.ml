@@ -41,7 +41,7 @@ module type DOMAIN =
     (* abstract element is the empty set *)
     val is_bottom: t -> bool
 
-    val print: int -> t -> string list -> unit
+    val print: int -> t -> string -> unit
     val print_all: int -> t -> unit
 
   end

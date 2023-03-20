@@ -36,9 +36,8 @@ module Interprete(D : DOMAIN) =
     let r = match s with
     | Sassign (_, (Tint, v_name), e, s) -> eval_stmt (D.assign a v_name e) s
     | Srefassign (_, (Tint, v_name), e) -> D.assign a v_name e
-    | Sprint (Eident ((l,_), Tint, (Tint, s))) -> D.print l.pos_lnum a [s]; a
-    | Sprint (Ederef ((l,_), Tint, (Tint, s))) -> D.print l.pos_lnum a [s]; a
-    | Sprintall (l,_) -> D.print_all l.pos_lnum a; a
+    | Sprint_ai ((l,_), (Tint, v_name)) -> D.print l.pos_lnum a v_name; a
+    | Sprintall_ai (l,_) -> D.print_all l.pos_lnum a; a
     | Sblock (Bstmt s) -> eval_stmt a s
     | Sblock (Bseq_l (s, b)) -> eval_stmt (eval_stmt a s) (Sblock b)
     | Sblock (Bseq_r (b, s)) -> eval_stmt (eval_stmt a (Sblock b)) s

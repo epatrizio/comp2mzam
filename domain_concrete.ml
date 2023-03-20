@@ -121,17 +121,13 @@ module Concrete = (struct
 
   let is_bottom m = EnvSet.is_empty m
 
-  let print lnum m vars =
+  let print lnum m var =
     eprintf "line %d: " lnum;
     eprintf "{ ";
     EnvSet.iter
       (fun env ->
         eprintf "[";
-        List.iter
-          (fun var ->
-            let v = Env.find var env in
-            eprintf "%s=%s;" var (Int.to_string v)
-          ) vars;
+        eprintf "%s=%s" var (Int.to_string (Env.find var env));
         eprintf "]; "
       ) m;
     eprintf "}@."

@@ -249,7 +249,14 @@ and type_stmt env s =
         | _ -> error loc "not boolean type (if condition statement)"
         end
       end
-  | Sprintall loc -> Sprintall loc
+    | Sprint_ai(loc,(_,i)) -> begin
+        try
+          let typ = Tmap.find i env in
+            if typ == Tint then Sprint_ai(loc,(Tint,i))
+            else error loc "not int ident (print_ai)"
+        with Not_found -> error loc ("unbound local var: " ^ i)
+      end
+  | Sprintall_ai loc -> Sprintall_ai loc
   | Sexit -> Sexit
   | Sskip -> Sskip
   end
