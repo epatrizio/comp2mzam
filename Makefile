@@ -32,6 +32,9 @@ clean_bc:
 check_grammar:
 	menhir --list-errors parser.mly
 
+help:
+	@./$(EXE) --help
+
 compile:
 	@./$(EXE) tests/$(S)
 
