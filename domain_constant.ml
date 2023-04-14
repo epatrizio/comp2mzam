@@ -20,6 +20,8 @@ module Constants = (struct
   | Val of env
   | BOTTOM
 
+  exception Empty
+
   let t_lift1 f (x : t_const) : t_const =
     match x with
     | BOT -> BOT
@@ -86,35 +88,43 @@ module Constants = (struct
     | BOT -> eprintf "⊥"
     | TOP -> eprintf "⊤"
     | Cst x -> eprintf "{%s}" (Int.to_string x)
-  
-  let rec eval_expr (e : expr) (m : env) : t_const =
-    match e with
-    | Ecst (_, Tint, Cint c) -> Cst c
-    | Eident (_, Tint, (Tint, var)) -> Env.find var m
-    | Eref (_, Tint, e) -> eval_expr e m
-    | Ederef (_, Tint, (Tint, var)) -> Env.find var m
-    | Ebinop (_, Tint, Badd, e1, e2) ->
-        let v1 = eval_expr e1 m and v2 = eval_expr e2 m in
-          t_lift2 (fun x y -> x + y) v1 v2
-    | Ebinop (_, Tint, Bsub, e1, e2) ->
-        let v1 = eval_expr e1 m and v2 = eval_expr e2 m in
-          t_lift2 (fun x y -> x - y) v1 v2
-    | Ebinop (_, Tint, Bmul, e1, e2) ->
-        let v1 = eval_expr e1 m and v2 = eval_expr e2 m in
-          if v1 = Cst 0 || v2 = Cst 0 then Cst 0
-          else t_lift2 (fun x y -> x * y) v1 v2
-    | Ebinop (_, Tint, Bdiv, e1, e2) ->
-        let v1 = eval_expr e1 m and v2 = eval_expr e2 m in
-          if v2 = Cst 0 then BOT
-          else t_lift2 (fun x y -> x / y) v1 v2
-    | Erand (_, Tint, Ecst (_, Tint, Cint i1), Ecst (_, Tint, Cint i2)) ->
-        if i1 = i2 then Cst i1
-        else if i1 < i2 then TOP
-        else BOT
-    | _ -> BOT
 
-  let eval_compare (e1 : expr) (bop : binop) (e2 : expr) (m : env) : bool =
-    let f =
+  type etree =
+    | E_binop of binop * etree * t_const * etree * t_const
+    | E_var of string * t_const
+    | E_cst of t_const
+
+  let rec eval_expr (e : expr) (m : env) : etree * t_const =
+    match e with
+    | Ecst (_, Tint, Cint c) ->
+        let tc = Cst c in E_cst tc, tc
+    | Eident (_, Tint, (Tint, var)) ->
+        let v = Env.find var m in E_var (var, v), v
+    | Eref (_, Tint, e) -> eval_expr e m
+    | Ederef (_, Tint, (Tint, var)) ->
+        let v = Env.find var m in E_var (var, v), v
+    | Ebinop (_, Tint, Badd, e1, e2) ->
+        let et1, v1 = eval_expr e1 m and et2, v2 = eval_expr e2 m in
+          E_binop (Badd, et1, v1, et2, v2), t_lift2 (fun x y -> x + y) v1 v2
+    | Ebinop (_, Tint, Bsub, e1, e2) ->
+        let et1, v1 = eval_expr e1 m and et2, v2 = eval_expr e2 m in
+          E_binop (Bsub, et1, v1, et2, v2), t_lift2 (fun x y -> x - y) v1 v2
+    | Ebinop (_, Tint, Bmul, e1, e2) ->
+        let et1, v1 = eval_expr e1 m and et2, v2 = eval_expr e2 m in
+          if v1 = Cst 0 || v2 = Cst 0 then E_cst (Cst 0), Cst 0
+          else E_binop (Bmul, et1, v1, et2, v2), t_lift2 (fun x y -> x * y) v1 v2
+    | Ebinop (_, Tint, Bdiv, e1, e2) ->
+      let et1, v1 = eval_expr e1 m and et2, v2 = eval_expr e2 m in
+          if v2 = Cst 0 then E_cst BOT, BOT
+          else E_binop (Bdiv, et1, v1, et2, v2), t_lift2 (fun x y -> x / y) v1 v2
+    | Erand (_, Tint, Ecst (_, Tint, Cint i1), Ecst (_, Tint, Cint i2)) ->
+        if i1 = i2 then E_cst (Cst i1), Cst i1
+        else if i1 < i2 then E_cst TOP, TOP
+        else E_cst BOT, BOT
+    | _ -> E_cst BOT, BOT
+
+  let apply_compare (e1 : expr) (bop : binop) (e2 : expr) (m : env) : env =
+    let f_comp =
       match bop with
       | Beq -> t_eq
       | Bneq -> t_neq
@@ -124,10 +134,21 @@ module Constants = (struct
       | Ble -> t_leq
       | _ -> assert false
     in
-    let s1 = eval_expr e1 m and s2 = eval_expr e2 m in
-    false
-    (* f s1 s2 *)
-    (* todo *)
+    let rec refine (m : env) (et : etree) (tc : t_const) : env =
+      match et with
+      | E_binop (b, et1, tc1, et2, tc2) -> refine (refine m et1 tc1) et2 tc2
+      | E_var (var, t) ->
+          let v = t_meet t tc in
+          if v = BOT then raise Empty;
+          Env.add var v m
+      | E_cst t ->
+          let v = t_meet t tc in
+          if v = BOT then raise Empty;
+          m
+    in
+    let et1, c1 = eval_expr e1 m and et2, c2 = eval_expr e2 m in
+    let cc1, cc2 = f_comp c1 c2 in
+    refine (refine m et1 cc1) et2 cc2
 
   let init () = Val Env.empty
 
@@ -147,30 +168,51 @@ module Constants = (struct
     match m with
     | BOTTOM -> BOTTOM
     | Val m ->
-        let c = eval_expr e m in
+        let _, c = eval_expr e m in
           if c = BOT then BOTTOM
           else Val (Env.add v c m)
 
-  let compare m e1 op e2 = m (* todo *)
-    (* Env.filter (fun _ env -> eval_compare e1 op e2 env) m *)
+  let compare m e1 op e2 =
+    match m with
+    | BOTTOM -> BOTTOM
+    | Val m ->
+        try Val (apply_compare e1 op e2 m)
+        with Empty -> BOTTOM
 
   let join m1 m2 =
     match m1, m2 with
     | BOTTOM, x | x, BOTTOM -> x
-    | Val m, Val n -> Val (Env.union (fun k a b -> Some (t_join a b)) m n) (* todo *)
+    | Val m, Val n -> 
+        Val (Env.union (fun k a b -> Some (t_join a b)) m n)
 
   let widen = join
 
   let meet m1 m2 =
     match m1, m2 with
-    | BOTTOM, x | x, BOTTOM -> BOTTOM
-    | Val m, Val n -> Val (Env.union (fun _ a b -> Some (t_meet a b)) m n) (* todo *)
+    | BOTTOM, x | x, BOTTOM -> x (* BOTTOM, x ? *)
+    | Val m, Val n -> 
+      try Val (
+        Env.merge
+          (fun _k a b -> match a, b with
+            | Some a, Some b ->
+              let r = t_meet a b in
+                (if r = BOT then raise Empty;
+                Some r)
+            | _, _ -> None
+          ) m n)
+      with Empty -> BOTTOM
 
   let subset m1 m2 =
     match m1, m2 with
     | BOTTOM, _ -> true
     | _, BOTTOM -> false
-    | Val m, Val n -> false (* Env.union (fun _ a b -> Some (t_subset a b)) m n *) (* todo *)
+    | Val m, Val n -> 
+        Env.fold (
+          fun _ tc_m acc_m -> 
+            Env.fold (
+              fun _ tc_n acc_n -> acc_n || t_subset tc_m tc_n
+            ) n acc_m
+        ) m false
 
   let is_bottom m =
     m = BOTTOM
