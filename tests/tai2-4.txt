@@ -1,0 +1,13 @@
+let x = (ref 0) in
+  begin
+    if (10 > (rand 1 5)) then
+      x := 1
+    else
+      x := 2;
+    print_ai x;
+    if (10 > (rand 1 12)) then
+      x := 1
+    else
+      x := 2;
+    print_ai x
+  end

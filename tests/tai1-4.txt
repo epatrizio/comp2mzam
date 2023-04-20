@@ -1,0 +1,6 @@
+let x = (ref 0) in
+  begin
+    while ((!x) < 10) do  (* infinite loop *)
+      print_ai x
+    done
+  end

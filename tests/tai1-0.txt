@@ -6,5 +6,10 @@ let y = (ref 2) in
     printall_ai;
     x := ((!x) - (!y));
     y := ((!y) + 8);
+    printall_ai;
+    x := ((!y) - (!x));
+    y := ((!y) * 8);
+    printall_ai;
+    y := ((!y) / 2);
     printall_ai
   end

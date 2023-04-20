@@ -1,0 +1,7 @@
+let x = (ref 0) in
+  begin
+    while ((rand 0 1) == 1) do  (* non deterministic loop *)
+      print_ai x;
+      x := ((!x) + 1)
+    done
+  end
