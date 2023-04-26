@@ -20,11 +20,12 @@ all:
 	ocamlc -c domain_non_rel.ml;
 	ocamlc -c domain_concrete.ml;
 	ocamlc -c domain_constant.ml;
+	ocamlc -c domain_interval.ml;
 	ocamlc -c abstract_interpreter.ml;
 	ocamlc -c main.ml;
 	ocamlc -o $(EXE) utils.cmo ast.cmo compiler.cmo lexer.cmo parser.cmo typer.cmo \
 	domain.cmo domain_value.cmo domain_non_rel.cmo domain_concrete.cmo domain_constant.cmo \
-	abstract_interpreter.cmo main.cmo
+	domain_interval.cmo abstract_interpreter.cmo main.cmo
 
 clean:
 	rm -rf *.cmo *.cmi lexer.ml parser.ml parser.mli $(EXE)
@@ -52,6 +53,9 @@ abs_inter_concrete:
 
 abs_inter_constant:
 	@./$(EXE) --abs-inter-constant tests/$(S)
+
+abs_inter_interval:
+	@./$(EXE) --abs-inter-interval tests/$(S)
 
 vm:
 	@$(VM) tests/build/bc_$(S)

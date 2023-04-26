@@ -4,6 +4,7 @@ open Utils
 let no_typing = ref false
 let abs_inter_concrete = ref false
 let abs_inter_constant = ref false
+let abs_inter_interval = ref false
 
 let debug = ref false
 
@@ -14,6 +15,7 @@ let options = [
   "--no-typing", Arg.Set no_typing, " Compile without typing checks";
   "--abs-inter-concrete", Arg.Set abs_inter_concrete, " Abstract interpretation - concrete domain";
   "--abs-inter-constant", Arg.Set abs_inter_constant, " Abstract interpretation - constant domain";
+  "--abs-inter-interval", Arg.Set abs_inter_interval, " Abstract interpretation - interval domain";
   "--debug", Arg.Set debug, " Debug mode (ast printer)"
 ]
 
@@ -26,7 +28,11 @@ module ConstantAnalysis =
   Abstract_interpreter.Interprete(
     Domain_non_rel.NonRelational(Domain_constant.Constants))
 
-let process source_code_file no_typing abs_inter_concrete abs_inter_constant debug =
+module IntervalAnalysis =
+  Abstract_interpreter.Interprete(
+    Domain_non_rel.NonRelational(Domain_interval.Intervals))
+
+let process source_code_file no_typing abs_inter_concrete abs_inter_constant abs_inter_interval debug =
     let ic = open_in source_code_file in
     let lexbuf = Lexing.from_channel ic in
   try
@@ -38,9 +44,13 @@ let process source_code_file no_typing abs_inter_concrete abs_inter_constant deb
         if abs_inter_constant then
           ConstantAnalysis.analyse_prog (Typer.typing ast)
         else (
-          let ast = if not no_typing then Typer.typing ast else ast in
-            if debug then ast_printer ast;
-            Compiler.compile ast source_code_file
+          if abs_inter_interval then
+            IntervalAnalysis.analyse_prog (Typer.typing ast)
+          else (
+            let ast = if not no_typing then Typer.typing ast else ast in
+              if debug then ast_printer ast;
+              Compiler.compile ast source_code_file
+          )
         )
       )
   with
@@ -72,4 +82,4 @@ let _ =
     Arg.usage options usage;
     exit 1
   end;
-  process !in_file_name !no_typing !abs_inter_concrete !abs_inter_constant !debug
+  process !in_file_name !no_typing !abs_inter_concrete !abs_inter_constant !abs_inter_interval !debug
