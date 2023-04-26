@@ -23,7 +23,8 @@ module ConcreteAnalysis =
   Abstract_interpreter.Interprete(Domain_concrete.Concrete)
 
 module ConstantAnalysis =
-  Abstract_interpreter.Interprete(Domain_constant.Constants)
+  Abstract_interpreter.Interprete(
+    Domain_non_rel.NonRelational(Domain_constant.Constants))
 
 let process source_code_file no_typing abs_inter_concrete abs_inter_constant debug =
     let ic = open_in source_code_file in
