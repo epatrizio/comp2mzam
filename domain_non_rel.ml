@@ -98,9 +98,13 @@ module NonRelational(D : VALUE_DOMAIN) = (struct
     match m1, m2 with
     | BOTTOM, x | x, BOTTOM -> x
     | Val m, Val n -> 
-        Val (Env.union (fun k a b -> Some (D.join a b)) m n)
+        Val (Env.union (fun _ a b -> Some (D.join a b)) m n)
 
-  let widen = join
+  let widen m1 m2 =
+    match m1, m2 with
+    | BOTTOM, x | x, BOTTOM -> x
+    | Val m, Val n ->
+        Val (Env.union (fun _ a b -> Some (D.widen a b)) m n)
 
   let meet m1 m2 =
     match m1, m2 with

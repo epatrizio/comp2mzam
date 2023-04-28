@@ -46,13 +46,13 @@ module Interprete(D : DOMAIN) =
         let f = eval_stmt (filter a e false) s2 in
           D.join t f
     | Swhile (_, e, b) ->
-        let rec fix (f:t -> t) (x:t) : t =
-          let fx = f x in
+        let rec fix (f:(t -> t -> t) -> t -> t) (op:t -> t -> t) (x:t) (i:int) : t =
+          let fx = f op x in
             if D.subset fx x then fx
-            else fix f fx
+            else fix f (if i < 3 then D.join else D.widen) fx (i+1) (* widening after 3 iterations *)
         in
-        let f x = D.join a (eval_stmt (filter x e true) (Sblock b)) in
-        let inv = fix f a in
+        let f op x = op a (eval_stmt (filter x e true) (Sblock b)) in
+        let inv = fix f D.join a 0 in
           filter inv e false
     | Sfor (l,s1,e,s2,b) ->
         let a1 = eval_stmt a s1 in
