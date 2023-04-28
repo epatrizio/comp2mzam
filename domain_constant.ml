@@ -26,29 +26,29 @@ module Constants = (struct
   let is_bottom x =
     x = BOT
 
-  let lift1 f (x : t) : t =
+  let lift1 f x =
     match x with
     | BOT -> BOT
     | TOP -> TOP
     | Cst a -> Cst (f a)
 
-  let lift2 f (x : t) (y : t) : t =
+  let lift2 f x y =
     match x, y with
     | BOT,_ | _,BOT -> BOT
     | TOP,_ | _,TOP -> TOP
     | Cst a, Cst b -> Cst (f a b)
 
-  let add = lift2 (fun x y -> x + y)
+  let add = lift2 Int.add
 
-  let sub = lift2 (fun x y -> x - y)
+  let sub = lift2 Int.sub
 
   let mul a b =
     if a = Cst 0 || b = Cst 0 then Cst 0
-    else lift2 (fun x y -> x * y) a b
+    else lift2 Int.mul a b
 
   let div a b =
     if b = Cst 0 then BOT
-    else lift2 (fun x y -> x / y) a b
+    else lift2 Int.div a b
 
   let unary a uop =
     match uop with

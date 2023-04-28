@@ -83,10 +83,10 @@ module Intervals = (struct
     | PINF,_ | _,MINF -> 1
     | Int i, Int j -> Int.compare i j
 
-  let bound_min_list (l : bound list) : bound =
+  let bound_min_list l =
     List.fold_left (fun acc e -> if bound_cmp acc e = -1 then acc else e) (List.hd l) l
 
-  let bound_max_list (l : bound list) : bound =
+  let bound_max_list l =
     List.fold_left (fun acc e -> if bound_cmp acc e = 1 then acc else e) (List.hd l) l
   
   let neg x =
