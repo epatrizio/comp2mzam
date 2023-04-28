@@ -1,0 +1,6 @@
+let x = (rand 1 5) in
+let y = (rand 6 9) in
+  if ((x < y) and (1 == 2)) then
+    print_ai x
+  else
+    print_ai y

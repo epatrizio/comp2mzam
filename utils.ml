@@ -102,6 +102,8 @@ let ast_printer ast_stmt =
     | Eaget (loc,typ,i,e) ->
         eprintf "Expr:array_get > "; loc_printer loc; type_printer typ; ident_printer i; expr_printer e
     | Easize (loc,typ,i) -> eprintf "Expr:array_size > "; loc_printer loc; type_printer typ; ident_printer i
+    | Erand (loc,typ,e1,e2) ->
+        eprintf "Expr:rand > "; loc_printer loc; type_printer typ; expr_printer e1; expr_printer e2
     end;
     eprintf "@]"
   and expr_list_printer l =
@@ -121,6 +123,8 @@ let ast_printer ast_stmt =
     | Sfor (loc,s1,e,s2,b) ->
         eprintf "Stmt:for > "; loc_printer loc; stmt_printer s1; expr_printer e; stmt_printer s2; block_printer b
     | Sprint e -> eprintf "Stmt:print > "; expr_printer e
+    | Sprint_ai (loc,i) -> eprintf "Stmt:print_ai > "; loc_printer loc; ident_printer i
+    | Sprintall_ai loc -> eprintf "Stmt:printall_ai > "; loc_printer loc
     | Sexit -> eprintf "Stmt:exit"
     | Sskip -> eprintf "Stmt:skip"
     end;

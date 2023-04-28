@@ -1,0 +1,2 @@
+let r = (rand 1 false) in (* error *)
+  print_ai r

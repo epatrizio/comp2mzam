@@ -1,0 +1,7 @@
+let x = (ref 0) in
+  begin
+    while ((!x) < 10) do
+      print_ai x;
+      x := ((!x) + 1)
+    done
+  end

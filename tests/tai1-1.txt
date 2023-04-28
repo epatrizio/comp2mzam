@@ -1,0 +1,13 @@
+let x = (ref 10) in
+  begin
+    if ((!x) > (10+1)) then
+      x := ((!x) - 1)
+    else
+      x := ((!x) + 1);
+    print_ai x;
+    if ((!x) > 10) then
+      x := ((!x) - 1)
+    else
+      x := ((!x) + 1);
+    print_ai x
+  end

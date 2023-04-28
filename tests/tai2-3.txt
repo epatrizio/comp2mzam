@@ -1,0 +1,8 @@
+let r1 = (rand 1 5) in
+let r2 = (rand 6 9) in
+let r = (ref (r1+r2)) in
+  begin
+    printall_ai;
+    r := (r1 * 10);
+    print_ai r
+  end

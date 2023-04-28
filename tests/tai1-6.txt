@@ -1,0 +1,13 @@
+let i = (ref 0) in
+let j = (ref 0) in
+  begin
+    while ((!i) < 5) do  (* nested loops *)
+      begin
+        while ((!j) < (!i)) do
+          j := ((!j) + 1)
+        done;
+        i := ((!i) + 1)
+      end
+    done;
+    printall_ai
+  end

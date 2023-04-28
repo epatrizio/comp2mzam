@@ -62,6 +62,9 @@ rule token = parse
   | "or"          { OR }
   | "not"         { NOT }
   | "print"       { PRINT }
+  | "print_ai"    { PRINT_AI }
+  | "printall_ai" { PRINT_ALL_AI }
+  | "rand"        { RAND }
   | "array_size"  { ARRAY_SIZE }
   | "exit"        { EXIT }
   | "skip"        { SKIP }

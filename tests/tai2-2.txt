@@ -1,0 +1,9 @@
+let r = (rand 1 9) in
+let x = (ref 0) in
+  begin
+    if (r > 5) then
+      x := 42
+    else
+      x := 21;
+    printall_ai
+  end

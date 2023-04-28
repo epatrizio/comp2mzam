@@ -35,6 +35,7 @@ type expr =
   | Earray of loc * typ * expr list
   | Eaget of loc * typ * ident * expr
   | Easize of loc * typ * ident
+  | Erand of loc * typ * expr * expr
 
 type stmt =
   | Sassign of loc * ident * expr * stmt
@@ -45,6 +46,8 @@ type stmt =
   | Swhile of loc * expr * block
   | Sfor of loc * stmt * expr * stmt * block
   | Sprint of expr
+  | Sprint_ai of loc * ident
+  | Sprintall_ai of loc
   | Sexit
   | Sskip
 

@@ -180,6 +180,11 @@ let rec type_expr env e =
           end
       with Not_found -> error loc ("unbound local var: " ^ i)
     end
+  | Erand (loc,_,e1,e2) ->
+      let ty1, ed1 = type_expr env e1 in
+      let ty2, ed2 = type_expr env e2 in
+        if ty1 == Tint && ty2 == Tint then Tint, Erand (loc,Tint,ed1,ed2)
+        else error loc "not integer type (> rand)"
 
 and type_stmt env s =
   begin match s with
@@ -244,6 +249,14 @@ and type_stmt env s =
         | _ -> error loc "not boolean type (if condition statement)"
         end
       end
+    | Sprint_ai(loc,(_,i)) -> begin
+        try
+          let typ = Tmap.find i env in
+            if typ == Tint then Sprint_ai(loc,(Tint,i))
+            else error loc "not int ident (print_ai)"
+        with Not_found -> error loc ("unbound local var: " ^ i)
+      end
+  | Sprintall_ai loc -> Sprintall_ai loc
   | Sexit -> Sexit
   | Sskip -> Sskip
   end
